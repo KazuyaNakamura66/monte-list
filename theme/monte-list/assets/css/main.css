@@ -399,6 +399,20 @@ button { font: inherit; color: inherit; }
 .site-footer__nav a { color: rgba(255, 255, 255, .85); text-decoration: none; }
 .site-footer__nav a:hover { text-decoration: underline; }
 
+/* ---------- 小ヘッダー（詳細ページなど） ---------- */
+.site-header { background: var(--c-hero); border-bottom: 1px solid var(--c-line); }
+.site-header__inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 60px; }
+.site-header__title { font-size: 16px; font-weight: 500; letter-spacing: 0.12em; text-decoration: none; }
+.saved-link.saved-link--static { position: static; flex: 0 0 auto; }
+
+/* ---------- 404 ---------- */
+.not-found { padding: 100px 0 120px; text-align: center; }
+.not-found__code { margin: 0; font-family: var(--font-en); font-size: 64px; line-height: 1; color: #d8cdc3; }
+.not-found__title { margin: 16px 0 0; font-size: 22px; font-weight: 500; letter-spacing: 0.1em; }
+.not-found__text { margin: 18px 0 0; color: var(--c-muted); font-size: 14px; }
+.not-found__search { max-width: 520px; margin: 32px auto; }
+.btn--link { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+
 /* ---------- 保存した活動 ---------- */
 .catalog-hero__inner { position: relative; }
 .saved-link {
@@ -430,7 +444,7 @@ button { font: inherit; color: inherit; }
 /* ==========================================================
    詳細ページ（教具・活動共通）
    ========================================================== */
-.detail { padding: 56px 0 100px; }
+.detail { padding: 32px 0 100px; }
 
 .breadcrumb ol {
 	display: flex;
@@ -665,7 +679,11 @@ button { font: inherit; color: inherit; }
 	.btn { min-width: 0; flex: 1; height: 46px; font-size: 14px; }
 	.filter__clear { align-self: center; }
 
-	.detail { padding-top: 24px; }
+	.detail { padding-top: 20px; }
+	.site-header__inner { min-height: 52px; }
+	.site-header__title { font-size: 14px; letter-spacing: 0.06em; }
+	.not-found { padding: 64px 0 80px; }
+	.not-found__text br { display: none; }
 	.detail-hero { grid-template-columns: 1fr; gap: 20px; margin-top: 18px; }
 	.detail-hero__title { font-size: 24px; }
 	.detail-hero__catch { font-size: 16px; }

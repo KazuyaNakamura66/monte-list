@@ -5,14 +5,7 @@
 
 get_header();
 ?>
-<header class="catalog-hero catalog-hero--simple">
-	<div class="container">
-		<p class="catalog-hero__title">
-			<a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php bloginfo( 'name' ); ?></a>
-		</p>
-		<p class="catalog-hero__sub">ACTIVITY LIBRARY</p>
-	</div>
-</header>
+<?php get_template_part( 'template-parts/site-header' ); ?>
 
 <main class="catalog">
 	<div class="container">

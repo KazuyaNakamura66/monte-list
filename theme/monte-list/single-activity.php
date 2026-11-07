@@ -4,6 +4,7 @@
  */
 
 get_header();
+get_template_part( 'template-parts/site-header' );
 
 while ( have_posts() ) :
 	the_post();

@@ -14,6 +14,8 @@ require_once __DIR__ . '/inc/helpers.php';
 require_once __DIR__ . '/inc/icons.php';
 require_once __DIR__ . '/inc/assets.php';
 require_once __DIR__ . '/inc/saved.php';
+require_once __DIR__ . '/inc/sort.php';
+require_once __DIR__ . '/inc/ogp.php';
 
 add_action( 'after_setup_theme', function () {
 	add_theme_support( 'title-tag' );
