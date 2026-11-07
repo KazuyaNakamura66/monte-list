@@ -71,6 +71,8 @@ $record_url   = monte_option( 'record_sheet_url' ) ?: '#';
 		<div class="subbar">
 			<?php if ( $stages ) : ?>
 				<nav class="sub-tabs" aria-label="発達段階">
+					<a class="sub-tab<?php echo $filters['period'] ? '' : ' is-active'; ?>"
+						href="<?php echo esc_url( add_query_arg( $keep, $base_url ) ); ?>">すべて</a>
 					<?php foreach ( $stages as $stage ) : ?>
 						<a class="sub-tab<?php echo $filters['period'] === $stage->slug ? ' is-active' : ''; ?>"
 							href="<?php echo esc_url( add_query_arg( array_merge( $keep, array( 'period' => $stage->slug ) ), $base_url ) ); ?>"><?php echo esc_html( $stage->name ); ?></a>
