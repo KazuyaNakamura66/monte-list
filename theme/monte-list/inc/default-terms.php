@@ -28,18 +28,17 @@ add_action( 'init', function () {
 /** v1: 領域・入手方法。 */
 function monte_terms_v1(): void {
 	$areas = array(
-		array( 'fine-motor', '微細運動', '#b89383', '指先の活動' ),
-		array( 'gross-motor', '粗大運動', '#8a4a5a', 'からだの活動' ),
-		array( 'sensorial', '感覚教育', '#c5c26a', '感覚の活動' ),
-		array( 'language', '言語教育', '#c98a6e', 'ことばの活動' ),
-		array( 'math', '数教育', '#6a76a8', 'かずの活動' ),
-		array( 'culture', '文化教育', '#9b88d0', '文化の活動' ),
+		array( 'fine-motor', '微細運動', '#b89383' ),
+		array( 'gross-motor', '粗大運動', '#8a4a5a' ),
+		array( 'sensorial', '感覚教育', '#c5c26a' ),
+		array( 'language', '言語教育', '#c98a6e' ),
+		array( 'math', '数教育', '#6a76a8' ),
+		array( 'culture', '文化教育', '#9b88d0' ),
 	);
-	foreach ( $areas as $order => list( $slug, $name, $color, $heading ) ) {
+	foreach ( $areas as $order => list( $slug, $name, $color ) ) {
 		$term_id = monte_ensure_term( 'area', $name, $slug );
 		if ( $term_id ) {
 			update_field( 'area_color', $color, "area_{$term_id}" );
-			update_field( 'area_heading', $heading, "area_{$term_id}" );
 			update_term_meta( $term_id, 'order', $order );
 		}
 	}

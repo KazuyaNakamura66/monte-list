@@ -21,9 +21,9 @@ $keep     = array_filter( array(
 if ( is_search() ) {
 	$heading = sprintf( '「%s」の検索結果', get_search_query() );
 } elseif ( $current_top ) {
-	$heading = get_field( 'area_heading', $current_top ) ?: $current_top->name;
+	$heading = $current_top->name; // タブ名と同じ
 } else {
-	$heading = 'すべての活動';
+	$heading = 'すべて';
 }
 
 $timeline_url = monte_option( 'timeline_url' ) ?: '#';

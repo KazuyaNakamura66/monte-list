@@ -231,7 +231,7 @@ add_action( 'acf/include_fields', function () {
 		),
 	) );
 
-	// 領域の設定（タブの色・見出し）
+	// 領域の設定（タブの色）
 	acf_add_local_field_group( array(
 		'key'      => 'group_area',
 		'title'    => '領域の表示設定',
@@ -242,15 +242,7 @@ add_action( 'acf/include_fields', function () {
 				'label'        => 'タブの色',
 				'name'         => 'area_color',
 				'type'         => 'color_picker',
-				'instructions' => '大分類（微細運動など）のみ使用',
-			),
-			array(
-				'key'          => 'field_area_heading',
-				'label'        => '一覧の見出し',
-				'name'         => 'area_heading',
-				'type'         => 'text',
-				'instructions' => '例：指先の活動（大分類のみ使用）',
-			),
+							),
 		),
 	) );
 
