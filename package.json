@@ -1,0 +1,12 @@
+{
+  "name": "monte-list",
+  "private": true,
+  "scripts": {
+    "start": "wp-env start",
+    "stop": "wp-env stop",
+    "wp": "wp-env run cli wp"
+  },
+  "devDependencies": {
+    "@wordpress/env": "^10.0.0"
+  }
+}

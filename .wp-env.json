@@ -1,0 +1,20 @@
+{
+  "core": null,
+  "phpVersion": "8.2",
+  "plugins": [
+    "https://downloads.wordpress.org/plugin/secure-custom-fields.zip",
+    "https://downloads.wordpress.org/plugin/wp-multibyte-patch.zip"
+  ],
+  "themes": [
+    "./theme/monte-list"
+  ],
+  "config": {
+    "WP_DEBUG": true
+  },
+  "lifecycleScripts": {
+    "afterStart": "npx wp-env run cli wp theme activate monte-list && npx wp-env run cli wp option update blog_public 0 && npx wp-env run cli wp language core install ja --activate && npx wp-env run cli wp option update timezone_string Asia/Tokyo && npx wp-env run cli wp rewrite structure '/%postname%/' --hard"
+  },
+  "mappings": {
+    "scripts": "./scripts"
+  }
+}
