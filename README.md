@@ -1,6 +1,6 @@
 # おうちモンテ活動カタログ
 
-WordPress ＋ オリジナルテーマ（`theme/monte-list`）。仕様は [docs/design.md](docs/design.md)、経緯・進捗は [docs/notes.md](docs/notes.md)。
+WordPress ＋ オリジナルテーマ（`theme/monte-list`）。仕様は [docs/design.md](docs/design.md)、経緯・進捗は [docs/notes.md](docs/notes.md)、本番公開の手順は [docs/deploy.md](docs/deploy.md)。
 
 ## ローカル環境
 必要: Docker Desktop, Node.js
@@ -10,6 +10,7 @@ npm install
 npm start          # http://localhost:8888 （管理画面 /wp-admin）
 npm run stop
 npx wp-env run cli wp eval-file scripts/seed-sample.php   # サンプル記事を投入
+npm run zip        # 本番アップロード用 dist/monte-list.zip を作成
 ```
 
 ローカル用アカウント

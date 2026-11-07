@@ -93,6 +93,8 @@ while ( have_posts() ) :
 					</section>
 				<?php endif; ?>
 
+				<?php get_template_part( 'template-parts/related' ); ?>
+
 				<?php get_template_part( 'template-parts/detail-nav' ); ?>
 			</div>
 		</div>

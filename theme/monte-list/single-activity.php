@@ -16,7 +16,6 @@ while ( have_posts() ) :
 	$presentation = get_field( 'presentation' );
 	$video_url    = get_field( 'video_url' );
 	$levelup      = monte_list_items( get_field( 'levelup' ) );
-	$related      = get_field( 'related' ) ?: array();
 	?>
 	<main class="detail">
 		<?php get_template_part( 'template-parts/detail-hero' ); ?>
@@ -89,22 +88,7 @@ while ( have_posts() ) :
 					</section>
 				<?php endif; ?>
 
-				<?php if ( $related ) : ?>
-					<section class="related">
-						<h2 class="related__title">関連する活動</h2>
-						<div class="card-grid card-grid--small">
-							<?php
-							global $post;
-							foreach ( $related as $related_id ) {
-								$post = get_post( $related_id ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride
-								setup_postdata( $post );
-								get_template_part( 'template-parts/card' );
-							}
-							wp_reset_postdata();
-							?>
-						</div>
-					</section>
-				<?php endif; ?>
+				<?php get_template_part( 'template-parts/related' ); ?>
 
 				<?php get_template_part( 'template-parts/detail-nav' ); ?>
 			</div>

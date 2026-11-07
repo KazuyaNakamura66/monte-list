@@ -138,6 +138,16 @@ add_action( 'acf/include_fields', function () {
 						),
 					),
 				),
+				array(
+					'key'           => 'field_tool_related',
+					'label'         => '関連する活動',
+					'name'          => 'related',
+					'type'          => 'relationship',
+					'post_type'     => array( 'activity', 'tool' ),
+					'filters'       => array( 'search', 'post_type', 'taxonomy' ),
+					'max'           => 3,
+					'return_format' => 'id',
+				),
 			)
 		),
 	) );
@@ -286,6 +296,14 @@ add_action( 'acf/include_fields', function () {
 				'label' => '発達記録シートのURL',
 				'name'  => 'record_sheet_url',
 				'type'  => 'url',
+			),
+			array(
+				'key'          => 'field_ga_id',
+				'label'        => 'Google アナリティクスの測定ID',
+				'name'         => 'ga_id',
+				'type'         => 'text',
+				'placeholder'  => 'G-XXXXXXXXXX',
+				'instructions' => '入力するとアクセス解析が有効になります（ログイン中の閲覧は計測しません）',
 			),
 		),
 	) );
