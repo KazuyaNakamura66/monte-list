@@ -7,7 +7,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-const MONTE_REWRITE_VERSION = 1;
+const MONTE_REWRITE_VERSION = 2;
 
 add_action( 'init', function () {
 	add_rewrite_rule( '^saved/?$', 'index.php?monte_saved=1', 'top' );

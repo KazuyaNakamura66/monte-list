@@ -44,7 +44,7 @@ seed_post( 'tool', 'pink-tower', 'ピンクタワー',
 );
 
 $ball = seed_post( 'activity', 'ball-drop', 'ボール落とし',
-	array( 'area' => array( 'grasp' ), 'stage' => array( 'grasp-reflex' ), 'acquire' => array( 'handmade' ) ),
+	array( 'area' => array( 'fine-motor' ), 'hand_motion' => array( 'grasp' ), 'stage' => array( 'grasp-reflex' ), 'acquire' => array( 'handmade' ) ),
 	array(
 		'catch'        => 'つかんで、狙って、落とす',
 		'lead'         => "つかんだボールを容器の穴に入れ、落とす活動です。\n目と手の協応や、指先のコントロールを育みます。",
@@ -66,7 +66,12 @@ $ball = seed_post( 'activity', 'ball-drop', 'ボール落とし',
 // 一覧表示確認用に活動をもう少し増やす
 for ( $i = 1; $i <= 8; $i++ ) {
 	seed_post( 'activity', "sample-{$i}", 'にぎる・ひらく',
-		array( 'area' => array( 'grasp' ), 'stage' => array( 'grasp-reflex' ) ),
-		array( 'catch' => 'サンプル活動', 'video_url' => 0 === $i % 3 ? 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' : '' )
+		array(
+			'area'        => array( 'fine-motor' ),
+			'hand_motion' => array( $i <= 5 ? 'grasp' : 'pinch' ),
+			'stage'       => array( $i <= 5 ? 'grasp-reflex' : 'tsumamu' ),
+			'acquire'     => array( 0 === $i % 2 ? 'buy' : 'substitute' ),
+		),
+		array( 'catch' => 'サンプル活動', 'video_url' => 0 === $i % 3 ? 'https://youtu.be/sample' : '' )
 	);
 }

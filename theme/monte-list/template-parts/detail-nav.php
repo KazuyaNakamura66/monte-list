@@ -4,8 +4,7 @@
  * 同じ種類（教具 or 活動）の前後の記事へ移動する。
  */
 
-$area     = monte_post_term( get_the_ID(), 'area' );
-$top      = $area && $area->parent ? get_term( $area->parent, 'area' ) : $area;
+$top      = monte_post_area( get_the_ID() );
 $list_url = $top ? get_term_link( $top ) : home_url( '/' );
 $prev     = get_previous_post();
 $next     = get_next_post();

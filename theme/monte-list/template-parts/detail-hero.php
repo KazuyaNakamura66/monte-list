@@ -4,8 +4,8 @@
  */
 
 $post_id = get_the_ID();
-$area    = monte_post_term( $post_id, 'area' );
-$top     = $area && $area->parent ? get_term( $area->parent, 'area' ) : $area;
+$top     = monte_post_area( $post_id );
+$motion  = monte_post_term( $post_id, 'hand_motion', false );
 $stage   = monte_post_term( $post_id, 'stage' );
 $stage_p = $stage && $stage->parent ? get_term( $stage->parent, 'stage' ) : null;
 
@@ -41,15 +41,15 @@ $crumbs = array_filter( array( $top, $stage_p, $stage ) );
 
 		<div class="detail-hero__info">
 			<div class="detail-hero__top">
-				<?php if ( $area ) : ?>
+				<?php if ( $top || $motion ) : ?>
 					<span class="pill">
 						<?php
-						echo esc_html( $top->name );
-						if ( $area->parent ) {
-							echo '<span class="pill__sep" aria-hidden="true"></span>' . esc_html( $area->name );
-						}
+						$parts = array_filter( array( $top ? $top->name : '', $motion ? $motion->name : '' ) );
+						echo implode( '<span class="pill__sep" aria-hidden="true"></span>', array_map( 'esc_html', $parts ) ); // phpcs:ignore WordPress.Security.EscapeOutput
 						?>
 					</span>
+				<?php else : ?>
+					<span></span>
 				<?php endif; ?>
 				<button class="bookmark bookmark--static" type="button" data-bookmark="<?php echo esc_attr( $post_id ); ?>" aria-pressed="false" aria-label="保存する">
 					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16l-5-4-5 4z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>

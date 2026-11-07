@@ -11,6 +11,7 @@ require_once __DIR__ . '/inc/default-terms.php';
 require_once __DIR__ . '/inc/noindex.php';
 require_once __DIR__ . '/inc/admin.php';
 require_once __DIR__ . '/inc/helpers.php';
+require_once __DIR__ . '/inc/icons.php';
 require_once __DIR__ . '/inc/assets.php';
 require_once __DIR__ . '/inc/saved.php';
 

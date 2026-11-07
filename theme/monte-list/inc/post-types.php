@@ -48,6 +48,14 @@ add_action( 'init', function () {
 		'rewrite'           => array( 'slug' => 'stage', 'hierarchical' => true ),
 	) );
 
+	register_taxonomy( 'hand_motion', $types, array(
+		'labels'            => monte_taxonomy_labels( '手の動き' ),
+		'hierarchical'      => true, // チェックボックスで選べるようにする
+		'show_admin_column' => true,
+		'show_in_rest'      => true,
+		'rewrite'           => array( 'slug' => 'motion' ),
+	) );
+
 	register_taxonomy( 'acquire', $types, array(
 		'labels'            => monte_taxonomy_labels( '入手方法' ),
 		'hierarchical'      => true, // チェックボックスで選べるようにする

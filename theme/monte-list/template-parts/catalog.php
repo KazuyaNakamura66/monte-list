@@ -3,10 +3,20 @@
  * カタログ一覧（トップページのデザイン）。
  */
 
-list( $current_top, $current_sub ) = monte_current_area();
+$current_top = monte_current_area();
+$filters     = monte_filters();
 
 $top_areas = monte_top_areas();
-$children  = $current_top ? monte_child_areas( $current_top->term_id ) : array();
+$stages    = $current_top ? monte_area_stages( $current_top->term_id ) : array();
+
+// タブ・絞り込みの基準URL（ページ番号なし）
+$base_url = $current_top ? get_term_link( $current_top ) : home_url( '/' );
+$keep     = array_filter( array(
+	's'      => get_search_query(),
+	'hand'   => $filters['hand'],
+	'source' => $filters['source'],
+	'video'  => $filters['video'],
+) );
 
 if ( is_search() ) {
 	$heading = sprintf( '「%s」の検索結果', get_search_query() );
@@ -59,19 +69,23 @@ $record_url   = monte_option( 'record_sheet_url' ) ?: '#';
 		</div>
 
 		<div class="subbar">
-			<?php if ( $children ) : ?>
-				<nav class="sub-tabs" aria-label="小分類">
-					<?php foreach ( $children as $child ) : ?>
-						<a class="sub-tab<?php echo $current_sub && $current_sub->term_id === $child->term_id ? ' is-active' : ''; ?>"
-							href="<?php echo esc_url( get_term_link( $child ) ); ?>"><?php echo esc_html( $child->name ); ?></a>
+			<?php if ( $stages ) : ?>
+				<nav class="sub-tabs" aria-label="発達段階">
+					<?php foreach ( $stages as $stage ) : ?>
+						<a class="sub-tab<?php echo $filters['period'] === $stage->slug ? ' is-active' : ''; ?>"
+							href="<?php echo esc_url( add_query_arg( array_merge( $keep, array( 'period' => $stage->slug ) ), $base_url ) ); ?>"><?php echo esc_html( $stage->name ); ?></a>
 					<?php endforeach; ?>
 				</nav>
 			<?php else : ?>
 				<div></div>
 			<?php endif; ?>
-			<button class="filter-button" type="button" aria-haspopup="dialog" data-filter-open>
-				<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h3m4 0h5M2 8h7m4 0h1M2 12h2m4 0h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="4" r="1.6" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="11" cy="8" r="1.6" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="6" cy="12" r="1.6" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+			<button class="filter-button<?php echo monte_filter_count() ? ' is-active' : ''; ?>" type="button" aria-haspopup="dialog" data-filter-open>
+				<?php monte_icon( 'filter' ); ?>
 				絞り込み
+				<?php if ( monte_filter_count() ) : ?>
+					<span class="filter-button__count"><?php echo esc_html( monte_filter_count() ); ?></span>
+				<?php endif; ?>
+				<svg class="filter-button__chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
 			</button>
 		</div>
 
@@ -85,7 +99,13 @@ $record_url   = monte_option( 'record_sheet_url' ) ?: '#';
 				?>
 			</div>
 		<?php else : ?>
-			<p class="catalog__empty">該当する活動はまだありません。</p>
+			<p class="catalog__empty">
+				<?php if ( monte_filter_count() || $filters['period'] || is_search() ) : ?>
+					条件に合う活動が見つかりませんでした。<br>条件を変えてお試しください。
+				<?php else : ?>
+					該当する活動はまだありません。
+				<?php endif; ?>
+			</p>
 		<?php endif; ?>
 
 		<nav class="pager" aria-label="ページ送り">
@@ -95,7 +115,4 @@ $record_url   = monte_option( 'record_sheet_url' ) ?: '#';
 	</div>
 </main>
 
-<dialog class="filter-dialog" data-filter-dialog>
-	<p>絞り込み条件は準備中です。</p>
-	<form method="dialog"><button class="filter-dialog__close">閉じる</button></form>
-</dialog>
+<?php get_template_part( 'template-parts/filter', null, array( 'base_url' => $base_url ) ); ?>

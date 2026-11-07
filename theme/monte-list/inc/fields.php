@@ -254,6 +254,50 @@ add_action( 'acf/include_fields', function () {
 		),
 	) );
 
+	// 発達段階の設定（どの領域のタブに出すか）
+	acf_add_local_field_group( array(
+		'key'      => 'group_stage',
+		'title'    => '発達段階の表示設定',
+		'location' => array( array( array( 'param' => 'taxonomy', 'operator' => '==', 'value' => 'stage' ) ) ),
+		'fields'   => array(
+			array(
+				'key'           => 'field_stage_area',
+				'label'         => '表示する領域',
+				'name'          => 'stage_area',
+				'type'          => 'taxonomy',
+				'taxonomy'      => 'area',
+				'field_type'    => 'select',
+				'allow_null'    => 1,
+				'add_term'      => 0,
+				'save_terms'    => 0,
+				'load_terms'    => 0,
+				'return_format' => 'id',
+				'instructions'  => '一覧のタブ（例：にぎる・つまむ期）として表示する領域。親の発達段階のみ設定してください',
+			),
+		),
+	) );
+
+	// 手の動き・入手方法のアイコン
+	acf_add_local_field_group( array(
+		'key'      => 'group_term_icon',
+		'title'    => 'アイコン',
+		'location' => array(
+			array( array( 'param' => 'taxonomy', 'operator' => '==', 'value' => 'hand_motion' ) ),
+			array( array( 'param' => 'taxonomy', 'operator' => '==', 'value' => 'acquire' ) ),
+		),
+		'fields'   => array(
+			array(
+				'key'           => 'field_term_icon',
+				'label'         => 'アイコン画像',
+				'name'          => 'term_icon',
+				'type'          => 'image',
+				'return_format' => 'id',
+				'preview_size'  => 'thumbnail',
+				'instructions'  => '絞り込みのボタンに表示されます（SVG または PNG、正方形推奨）',
+			),
+		),
+	) );
+
 	// サイト設定
 	acf_add_local_field_group( array(
 		'key'      => 'group_settings',
