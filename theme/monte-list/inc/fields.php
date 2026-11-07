@@ -277,27 +277,6 @@ add_action( 'acf/include_fields', function () {
 		),
 	) );
 
-	// 手の動き・入手方法のアイコン
-	acf_add_local_field_group( array(
-		'key'      => 'group_term_icon',
-		'title'    => 'アイコン',
-		'location' => array(
-			array( array( 'param' => 'taxonomy', 'operator' => '==', 'value' => 'hand_motion' ) ),
-			array( array( 'param' => 'taxonomy', 'operator' => '==', 'value' => 'acquire' ) ),
-		),
-		'fields'   => array(
-			array(
-				'key'           => 'field_term_icon',
-				'label'         => 'アイコン画像',
-				'name'          => 'term_icon',
-				'type'          => 'image',
-				'return_format' => 'id',
-				'preview_size'  => 'thumbnail',
-				'instructions'  => '絞り込みのボタンに表示されます（SVG または PNG、正方形推奨）',
-			),
-		),
-	) );
-
 	// サイト設定
 	acf_add_local_field_group( array(
 		'key'      => 'group_settings',

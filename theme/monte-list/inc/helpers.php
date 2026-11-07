@@ -175,12 +175,6 @@ function monte_option( string $name ): string {
 	return function_exists( 'get_field' ) ? (string) get_field( $name, 'option' ) : '';
 }
 
-/** タームのアイコン画像（未設定なら空）。 */
-function monte_term_icon( WP_Term $term ): string {
-	$id = function_exists( 'get_field' ) ? get_field( 'term_icon', $term ) : 0;
-	return $id ? wp_get_attachment_image( $id, 'thumbnail', false, array( 'class' => 'chip__icon', 'alt' => '' ) ) : '';
-}
-
 /** リピーター（text 1列）の値を文字列の配列にする。 */
 function monte_list_items( $rows ): array {
 	if ( ! is_array( $rows ) ) {

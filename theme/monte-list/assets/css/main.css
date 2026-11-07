@@ -353,7 +353,6 @@ button { font: inherit; color: inherit; }
 }
 .chip input:focus-visible + .chip__face,
 .chip--all:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
-.chip__icon { width: 22px; height: 22px; object-fit: contain; color: var(--c-accent); }
 .chip__chevron { width: 16px; height: 16px; transition: transform .2s; }
 .chip--more[aria-expanded="true"] .chip__chevron { transform: rotate(180deg); }
 
@@ -661,7 +660,6 @@ button { font: inherit; color: inherit; }
 	.chip { font-size: 13px; }
 	.chip__face, .chip--all { min-height: 36px; padding: 0 14px; }
 	.chip--all { min-width: 0; }
-	.chip__icon { width: 18px; height: 18px; }
 	.filter__footer { flex-direction: column-reverse; align-items: stretch; }
 	.filter__actions { gap: 10px; }
 	.btn { min-width: 0; flex: 1; height: 46px; font-size: 14px; }

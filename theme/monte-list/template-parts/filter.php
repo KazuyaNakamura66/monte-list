@@ -14,21 +14,11 @@ $visible_motions = array_slice( $motions, 0, MONTE_MOTION_VISIBLE );
 $more_motions    = array_slice( $motions, MONTE_MOTION_VISIBLE );
 $more_selected   = (bool) array_intersect( wp_list_pluck( $more_motions, 'slug' ), $f['hand'] );
 
-$chip = function ( WP_Term $term, string $name, array $selected, string $fallback_icon = '' ) {
-	$icon = monte_term_icon( $term );
+$chip = function ( WP_Term $term, string $name, array $selected ) {
 	?>
 	<label class="chip">
 		<input type="checkbox" name="<?php echo esc_attr( $name ); ?>[]" value="<?php echo esc_attr( $term->slug ); ?>" <?php checked( in_array( $term->slug, $selected, true ) ); ?>>
-		<span class="chip__face">
-			<?php
-			if ( $icon ) {
-				echo $icon; // phpcs:ignore WordPress.Security.EscapeOutput
-			} elseif ( $fallback_icon ) {
-				monte_icon( $fallback_icon, 'chip__icon' );
-			}
-			echo esc_html( $term->name );
-			?>
-		</span>
+		<span class="chip__face"><?php echo esc_html( $term->name ); ?></span>
 	</label>
 	<?php
 };
@@ -75,7 +65,7 @@ $chip = function ( WP_Term $term, string $name, array $selected, string $fallbac
 				<div class="chips">
 					<button class="chip chip--all" type="button" data-chip-all>すべて</button>
 					<?php foreach ( $sources as $term ) : ?>
-						<?php $chip( $term, 'source', $f['source'], monte_acquire_icon_name( $term->slug ) ); ?>
+						<?php $chip( $term, 'source', $f['source'] ); ?>
 					<?php endforeach; ?>
 				</div>
 			</fieldset>
@@ -90,11 +80,11 @@ $chip = function ( WP_Term $term, string $name, array $selected, string $fallbac
 				</label>
 				<label class="chip">
 					<input type="radio" name="video" value="yes" <?php checked( 'yes', $f['video'] ); ?>>
-					<span class="chip__face"><?php monte_icon( 'play', 'chip__icon' ); ?>あり</span>
+					<span class="chip__face">あり</span>
 				</label>
 				<label class="chip">
 					<input type="radio" name="video" value="no" <?php checked( 'no', $f['video'] ); ?>>
-					<span class="chip__face"><?php monte_icon( 'play-off', 'chip__icon' ); ?>なし</span>
+					<span class="chip__face">なし</span>
 				</label>
 			</div>
 		</fieldset>
