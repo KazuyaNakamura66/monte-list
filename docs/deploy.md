@@ -7,6 +7,16 @@
 - 無料 SSL（https）が使えること
 - 自動バックアップがあると安心
 
+## 0.5 サブドメインを作る（さくら + UTAGE 併用の場合）
+monte.com 本体は UTAGE のまま、catalog.monte.com だけさくらに向ける。
+1. さくらのコントロールパネル > ドメイン/SSL > ドメイン新規追加 で `catalog.monte.com` を追加（他社ドメインを使う扱い）。公開フォルダは新しいフォルダを指定
+2. コントロールパネル > サーバー情報 で、初期ドメイン（`○○.sakura.ne.jp`）と IP アドレスを確認
+3. monte.com の DNS 管理画面に 1 行追加: `catalog` CNAME `○○.sakura.ne.jp`（または A レコードで IP）
+   - **ネームサーバーは変更しない**（変えると UTAGE 側が止まる）
+   - 既存のレコードは触らない
+4. 反映を待つ（数分〜最大1日程度）。ブラウザで http://catalog.monte.com が開けば OK
+5. ドメイン/SSL で catalog.monte.com に無料 SSL（Let's Encrypt）を設定
+
 ## 1. WordPress を入れる
 1. サーバーの管理画面で、ドメインを設定して **無料 SSL を有効化** する
 2. 「WordPress 簡単インストール」などで WordPress を入れる
