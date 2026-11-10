@@ -61,7 +61,7 @@ button { font: inherit; color: inherit; }
 /* ---------- ヒーロー（ベージュ部分） ---------- */
 .catalog-hero {
 	background: var(--c-hero);
-	padding-top: 64px;
+	padding-top: 40px;
 }
 .catalog-hero__title {
 	margin: 0;
@@ -125,7 +125,7 @@ button { font: inherit; color: inherit; }
 }
 
 /* ---------- 一覧 ---------- */
-.catalog { padding: 44px 0 80px; }
+.catalog { padding: 28px 0 80px; }
 
 .catalog__heading {
 	display: flex;
@@ -417,7 +417,7 @@ button { font: inherit; color: inherit; }
 .catalog-hero__inner { position: relative; }
 .saved-link {
 	position: absolute;
-	top: -44px; right: var(--gutter);
+	top: -28px; right: var(--gutter);
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;
@@ -437,14 +437,14 @@ button { font: inherit; color: inherit; }
 	line-height: 20px;
 	text-align: center;
 }
-.catalog-hero--simple { padding: 64px 0 40px; }
+.catalog-hero--simple { padding: 40px 0 32px; }
 .saved__note { margin: 10px 0 0; font-size: 13px; color: var(--c-muted); }
 .saved__back { margin-top: 64px; text-align: center; font-size: 13px; }
 
 /* ==========================================================
    詳細ページ（教具・活動共通）
    ========================================================== */
-.detail { padding: 32px 0 100px; }
+.detail { padding: 20px 0 100px; }
 
 .breadcrumb ol {
 	display: flex;
@@ -648,13 +648,13 @@ button { font: inherit; color: inherit; }
 
 @media (max-width: 600px) {
 	body { font-size: 14px; }
-	.catalog-hero { padding-top: 48px; }
-	.saved-link { top: -36px; }
+	.catalog-hero { padding-top: 36px; }
+	.saved-link { top: -26px; }
 	.catalog-hero--simple { padding: 40px 0 28px; }
 	.catalog-hero__title { font-size: 20px; }
 	.area-tabs { gap: 6px; margin-right: calc(var(--gutter) * -1); }
 	.area-tab { min-width: 96px; height: 46px; font-size: 14px; }
-	.catalog { padding-top: 32px; }
+	.catalog { padding-top: 20px; }
 	.catalog__heading { font-size: 21px; }
 	.notice { padding: 16px 18px; font-size: 13px; line-height: 1.9; }
 	.notice br { display: none; }
@@ -679,7 +679,7 @@ button { font: inherit; color: inherit; }
 	.btn { min-width: 0; flex: 1; height: 46px; font-size: 14px; }
 	.filter__clear { align-self: center; }
 
-	.detail { padding-top: 20px; }
+	.detail { padding-top: 14px; }
 	.site-header__inner { min-height: 52px; }
 	.site-header__title { font-size: 14px; letter-spacing: 0.06em; }
 	.not-found { padding: 64px 0 80px; }
