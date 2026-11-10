@@ -19,7 +19,7 @@
 - 2026-11-10 catalog.ouchimonte.com の A レコード登録済み・さくらサーバーに到達（中身が空のため 404）。次は無料 SSL → WordPress インストール
 - 2026-11-10 無料SSL（Let's Encrypt）発行済み・自動更新。次は WordPress クイックインストール
 - 2026-11-10 WordPress クイックインストール済み（https、インデックスしない ON）。PHP を 7.4 → 8.3（モジュールモード）に変更。次はテーマ・プラグイン導入
-- 2026-11-10 本番 https://catalog.ouchimonte.com にテーマ有効化・SCF / WP Multibyte Patch 有効化。noindex・領域タブ・/saved/ 動作確認済み。残り: 一般設定の確認、編集者ユーザー、ログイン保護、バックアップ、サイト設定の URL
+- 2026-11-10 本番 https://catalog.ouchimonte.com にテーマ有効化・SCF / WP Multibyte Patch 有効化。noindex・領域タブ・/saved/ 動作確認済み。ログイン保護（Limit Login Attempts）・編集者ユーザー作成済み。残り: バックアップ確認、サイト設定の URL、記事入力
 - 2026-11-07 入力項目はコード（fields.php）で定義し、本番にもテーマごと持っていく
 - 2026-11-07 標準の「投稿」メニューは使わないため非表示
 - 2026-11-07 「サイト設定」（外部リンクURL）は編集者も変更可能にした
