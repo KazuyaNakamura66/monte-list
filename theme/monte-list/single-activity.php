@@ -16,6 +16,7 @@ while ( have_posts() ) :
 	if ( $template_ext ) {
 		$template_url = (string) get_field( 'template_url' );
 	}
+	$template_label = trim( (string) get_field( 'template_label' ) ) ?: '型紙をダウンロードする';
 	$materials    = get_field( 'materials' ) ?: array();
 	$mat_image    = get_field( 'materials_image' );
 	$presentation = get_field( 'presentation' );
@@ -40,7 +41,7 @@ while ( have_posts() ) :
 						<div class="detail-section__content">
 							<?php if ( $template_url ) : ?>
 								<p class="download">
-									<a href="<?php echo esc_url( $template_url ); ?>"<?php echo $template_ext ? ' target="_blank" rel="noopener"' : ' download'; ?>>型紙をダウンロードする</a>
+									<a href="<?php echo esc_url( $template_url ); ?>"<?php echo $template_ext ? ' target="_blank" rel="noopener"' : ' download'; ?>><?php echo esc_html( $template_label ); ?></a>
 								</p>
 							<?php endif; ?>
 
