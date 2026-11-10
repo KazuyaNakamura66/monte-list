@@ -10,7 +10,7 @@ while ( have_posts() ) :
 	the_post();
 
 	$overview     = get_field( 'overview' );
-	$template_url   = (string) get_field( 'template_url' );
+	$template_url   = (string) ( get_field( 'template_pdf' ) ?: get_field( 'template_url' ) ); // PDF優先
 	$template_label = trim( (string) get_field( 'template_label' ) ) ?: 'ダウンロードする';
 	$materials    = get_field( 'materials' ) ?: array();
 	$mat_image    = get_field( 'materials_image' );
