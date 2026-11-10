@@ -10,7 +10,12 @@ while ( have_posts() ) :
 	the_post();
 
 	$overview     = get_field( 'overview' );
-	$template     = get_field( 'template_file' );
+	$template_file = get_field( 'template_file' );
+	$template_url  = $template_file['url'] ?? '';
+	$template_ext  = ! $template_url; // 外部URLの型紙は別タブで開く
+	if ( $template_ext ) {
+		$template_url = (string) get_field( 'template_url' );
+	}
 	$materials    = get_field( 'materials' ) ?: array();
 	$mat_image    = get_field( 'materials_image' );
 	$presentation = get_field( 'presentation' );
@@ -29,13 +34,13 @@ while ( have_posts() ) :
 					</section>
 				<?php endif; ?>
 
-				<?php if ( $template || $materials || $mat_image ) : ?>
+				<?php if ( $template_url || $materials || $mat_image ) : ?>
 					<section class="detail-section">
 						<h2 class="detail-section__label">用意するもの</h2>
 						<div class="detail-section__content">
-							<?php if ( $template ) : ?>
+							<?php if ( $template_url ) : ?>
 								<p class="download">
-									<a href="<?php echo esc_url( $template['url'] ); ?>" download>型紙をダウンロードする</a>
+									<a href="<?php echo esc_url( $template_url ); ?>"<?php echo $template_ext ? ' target="_blank" rel="noopener"' : ' download'; ?>>型紙をダウンロードする</a>
 								</p>
 							<?php endif; ?>
 

@@ -178,6 +178,13 @@ add_action( 'acf/include_fields', function () {
 					'instructions'  => '「型紙をダウンロードする」リンクになります（任意）',
 				),
 				array(
+					'key'          => 'field_activity_template_url',
+					'label'        => '型紙のURL',
+					'name'         => 'template_url',
+					'type'         => 'url',
+					'instructions' => 'Googleドライブなど外部の型紙にリンクする場合（任意）。ファイルを追加した場合はファイルが優先されます',
+				),
+				array(
 					'key'          => 'field_activity_materials',
 					'label'        => '用意するもの',
 					'name'         => 'materials',
