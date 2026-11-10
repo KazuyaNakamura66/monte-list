@@ -23,7 +23,11 @@
 *::before,
 *::after { box-sizing: border-box; }
 
-html { -webkit-text-size-adjust: 100%; }
+html {
+	-webkit-text-size-adjust: 100%;
+	background: var(--c-footer); /* スマホで下に引っぱったときに白が出ないように */
+	overscroll-behavior-y: none;
+}
 
 body {
 	margin: 0;
@@ -125,7 +129,7 @@ button { font: inherit; color: inherit; }
 }
 
 /* ---------- 一覧 ---------- */
-.catalog { padding: 28px 0 80px; }
+.catalog { padding: 28px 0 64px; }
 
 .catalog__heading {
 	display: flex;
@@ -271,7 +275,7 @@ button { font: inherit; color: inherit; }
 	display: flex;
 	justify-content: center;
 	gap: 80px;
-	margin-top: 120px;
+	margin-top: 64px;
 	font-family: var(--font-en);
 	font-size: 14px;
 	letter-spacing: 0.04em;
@@ -281,6 +285,7 @@ button { font: inherit; color: inherit; }
 .pager a:hover { color: var(--c-text); }
 .pager__arrow { font-size: 20px; line-height: 1; }
 .pager__prev:empty, .pager__next:empty { display: none; }
+.pager:not(:has(a)) { display: none; } /* 1ページだけのときは余白ごと消す */
 
 /* ---------- 絞り込みダイアログ ---------- */
 .filter-dialog {
@@ -388,8 +393,7 @@ button { font: inherit; color: inherit; }
 
 /* ---------- フッター ---------- */
 .site-footer {
-	min-height: 330px;
-	padding: 60px 0;
+	padding: 36px 0 calc(36px + env(safe-area-inset-bottom));
 	background: var(--c-footer);
 	color: rgba(255, 255, 255, .6);
 	font-size: 12px;
@@ -444,7 +448,7 @@ button { font: inherit; color: inherit; }
 /* ==========================================================
    詳細ページ（教具・活動共通）
    ========================================================== */
-.detail { padding: 20px 0 100px; }
+.detail { padding: 20px 0 72px; }
 
 .breadcrumb ol {
 	display: flex;
@@ -663,8 +667,9 @@ button { font: inherit; color: inherit; }
 	.sub-tab { font-size: 14px; }
 	.filter-button { padding: 7px 10px; font-size: 12px; gap: 5px; }
 	.card-grid { grid-template-columns: 1fr; }
-	.pager { margin-top: 64px; }
-	.site-footer { min-height: 200px; }
+	.pager { margin-top: 40px; }
+	.catalog { padding-bottom: 48px; }
+	.site-footer { padding-top: 28px; }
 
 	.filter { padding: 20px 18px 22px; }
 	.filter__title { font-size: 18px; }
