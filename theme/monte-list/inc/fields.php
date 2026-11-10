@@ -170,19 +170,11 @@ add_action( 'acf/include_fields', function () {
 					'media_upload' => 0,
 				),
 				array(
-					'key'           => 'field_activity_template_file',
-					'label'         => 'ダウンロードファイル',
-					'name'          => 'template_file',
-					'type'          => 'file',
-					'return_format' => 'array',
-					'instructions'  => '型紙・ワークシートなど。「用意するもの」の上にリンクが出ます（任意）',
-				),
-				array(
 					'key'          => 'field_activity_template_url',
 					'label'        => 'リンク先URL',
 					'name'         => 'template_url',
 					'type'         => 'url',
-					'instructions' => 'Googleドライブなど外部にリンクする場合（任意）。ファイルを追加した場合はファイルが優先されます',
+					'instructions' => '型紙・ワークシートなど（Googleドライブ等のURL）。「用意するもの」の上にリンクが出ます（任意）',
 				),
 				array(
 					'key'          => 'field_activity_template_label',
