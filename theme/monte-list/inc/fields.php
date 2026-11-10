@@ -181,8 +181,8 @@ add_action( 'acf/include_fields', function () {
 					'label'        => 'リンクの文字',
 					'name'         => 'template_label',
 					'type'         => 'text',
-					'placeholder'  => '型紙をダウンロードする',
-					'instructions' => '空欄なら「型紙をダウンロードする」と表示されます',
+					'placeholder'  => 'ダウンロードする',
+					'instructions' => '空欄なら「ダウンロードする」と表示されます',
 				),
 				array(
 					'key'          => 'field_activity_materials',

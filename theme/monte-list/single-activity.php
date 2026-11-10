@@ -11,7 +11,7 @@ while ( have_posts() ) :
 
 	$overview     = get_field( 'overview' );
 	$template_url   = (string) get_field( 'template_url' );
-	$template_label = trim( (string) get_field( 'template_label' ) ) ?: '型紙をダウンロードする';
+	$template_label = trim( (string) get_field( 'template_label' ) ) ?: 'ダウンロードする';
 	$materials    = get_field( 'materials' ) ?: array();
 	$mat_image    = get_field( 'materials_image' );
 	$presentation = get_field( 'presentation' );
