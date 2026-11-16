@@ -8,6 +8,8 @@ $filters     = monte_filters();
 
 $top_areas = monte_top_areas();
 $stages    = $current_top ? monte_area_stages( $current_top->term_id ) : array();
+$links     = $current_top ? monte_area_links( $current_top ) : array(); // 関連資料
+$period    = monte_current_period(); // 選択中の発達段階タブ（未指定なら最初の段階）
 
 // タブ・絞り込みの基準URL（ページ番号なし）
 $base_url = $current_top ? get_term_link( $current_top ) : home_url( '/' );
@@ -21,13 +23,21 @@ $keep     = array_filter( array(
 if ( is_search() ) {
 	$heading = sprintf( '「%s」の検索結果', get_search_query() );
 } elseif ( $current_top ) {
-	$heading = $current_top->name; // タブ名と同じ
+	$heading = monte_area_heading( $current_top ); // 例: 指先の活動
 } else {
 	$heading = 'すべて';
 }
 
-$timeline_url = monte_option( 'timeline_url' ) ?: '#';
-$record_url   = monte_option( 'record_sheet_url' ) ?: '#';
+// 一覧のパネル・小タブの色（薄い色が未設定なら CSS でタブの色から作る）
+$area_style = '--area-color:' . ( $current_top ? monte_area_color( $current_top ) : '#b5694a' ) . ';';
+if ( $current_top ) {
+	foreach ( array( 1, 2 ) as $n ) {
+		$light = monte_area_light( $current_top, $n );
+		if ( $light ) {
+			$area_style .= "--area-light{$n}:{$light};";
+		}
+	}
+}
 ?>
 <header class="catalog-hero">
 	<div class="container catalog-hero__inner">
@@ -46,35 +56,54 @@ $record_url   = monte_option( 'record_sheet_url' ) ?: '#';
 		</form>
 
 		<nav class="area-tabs" aria-label="領域">
-			<a class="area-tab<?php echo $current_top || is_search() ? '' : ' is-active'; ?>" href="<?php echo esc_url( home_url( '/' ) ); ?>" style="--area-color:#3b3530">すべて</a>
 			<?php foreach ( $top_areas as $area ) : ?>
 				<a class="area-tab<?php echo $current_top && $current_top->term_id === $area->term_id ? ' is-active' : ''; ?>"
 					href="<?php echo esc_url( get_term_link( $area ) ); ?>"
-					style="--area-color:<?php echo esc_attr( monte_area_color( $area ) ); ?>"><?php echo esc_html( $area->name ); ?></a>
+					style="--area-color:<?php echo esc_attr( monte_area_color( $area ) ); ?>"><?php echo monte_area_tab_label( $area->name ); // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
 			<?php endforeach; ?>
 		</nav>
 	</div>
 </header>
 
-<main class="catalog">
+<main class="catalog" style="<?php echo esc_attr( $area_style ); ?>">
 	<div class="container">
-		<h2 class="catalog__heading">
-			<svg class="catalog__icon" viewBox="0 0 32 24" aria-hidden="true"><path d="M9 15c3-6 9-10 15-10 3 0 5 2 4 4-1 3-6 4-9 4M9 15c2 3 6 5 10 4 3-1 5-3 5-5M9 15H4m2-4H2m4 8H3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-			<?php echo esc_html( $heading ); ?>
-		</h2>
+		<h2 class="catalog__heading"><?php echo esc_html( $heading ); ?></h2>
 
-		<div class="notice">
-			<p>活動カテゴリーは、「<a href="<?php echo esc_url( $timeline_url ); ?>" target="_blank" rel="noopener">発達タイムライン</a>」と「<a href="<?php echo esc_url( $record_url ); ?>" target="_blank" rel="noopener">発達記録シート</a>」に対応しています。<br>
-			お子さんの今の発達段階や、どの活動を取り入れるか迷ったときは、あわせて確認してみてください。</p>
-		</div>
+		<?php if ( $stages || $links ) : ?>
+			<div class="guide<?php echo $stages && $links ? '' : ' guide--single'; ?>">
+				<?php if ( $stages ) : ?>
+					<div class="guide__steps">
+						<p class="guide__title"><?php echo esc_html( monte_area_step_title( $current_top ) ); ?></p>
+						<ol class="steps">
+							<?php foreach ( $stages as $i => $stage ) : ?>
+								<li class="steps__item<?php echo $period === $stage->slug ? ' is-active' : ''; ?>">
+									<a href="<?php echo esc_url( add_query_arg( array_merge( $keep, array( 'period' => $stage->slug ) ), $base_url ) ); ?>">
+										<span class="steps__num"><?php echo esc_html( sprintf( '%02d', $i + 1 ) ); ?></span>
+										<span class="steps__label"><?php echo esc_html( $stage->name ); ?></span>
+									</a>
+								</li>
+							<?php endforeach; ?>
+						</ol>
+					</div>
+				<?php endif; ?>
+				<?php if ( $links ) : ?>
+					<div class="guide__links">
+						<p class="guide__title">関連資料</p>
+						<ul class="doc-links">
+							<?php foreach ( $links as list( $label, $url ) ) : ?>
+								<li><a class="doc-link" href="<?php echo esc_url( $url ?: '#' ); ?>"<?php echo $url ? ' target="_blank" rel="noopener"' : ''; ?>><?php echo esc_html( $label ); ?><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+							<?php endforeach; ?>
+						</ul>
+					</div>
+				<?php endif; ?>
+			</div>
+		<?php endif; ?>
 
 		<div class="subbar">
 			<?php if ( $stages ) : ?>
 				<nav class="sub-tabs" aria-label="発達段階">
-					<a class="sub-tab<?php echo $filters['period'] ? '' : ' is-active'; ?>"
-						href="<?php echo esc_url( add_query_arg( $keep, $base_url ) ); ?>">すべて</a>
 					<?php foreach ( $stages as $stage ) : ?>
-						<a class="sub-tab<?php echo $filters['period'] === $stage->slug ? ' is-active' : ''; ?>"
+						<a class="sub-tab<?php echo $period === $stage->slug ? ' is-active' : ''; ?>"
 							href="<?php echo esc_url( add_query_arg( array_merge( $keep, array( 'period' => $stage->slug ) ), $base_url ) ); ?>"><?php echo esc_html( $stage->name ); ?></a>
 					<?php endforeach; ?>
 				</nav>
@@ -102,7 +131,7 @@ $record_url   = monte_option( 'record_sheet_url' ) ?: '#';
 			</div>
 		<?php else : ?>
 			<p class="catalog__empty">
-				<?php if ( monte_filter_count() || $filters['period'] || is_search() ) : ?>
+				<?php if ( monte_filter_count() || $period || is_search() ) : ?>
 					条件に合う活動が見つかりませんでした。<br>条件を変えてお試しください。
 				<?php else : ?>
 					該当する活動はまだありません。

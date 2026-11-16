@@ -257,18 +257,78 @@ add_action( 'acf/include_fields', function () {
 		),
 	) );
 
-	// 領域の設定（タブの色）
+	// 領域の設定（タブの色・見出し・関連資料）
 	acf_add_local_field_group( array(
 		'key'      => 'group_area',
 		'title'    => '領域の表示設定',
 		'location' => array( array( array( 'param' => 'taxonomy', 'operator' => '==', 'value' => 'area' ) ) ),
 		'fields'   => array(
 			array(
+				'key'          => 'field_area_order',
+				'label'        => '順番',
+				'name'         => 'order',
+				'type'         => 'number',
+				'step'         => 1,
+				'instructions' => 'タブの並び順。小さい数字ほど左に表示されます（空欄は最後）',
+			),
+			array(
 				'key'          => 'field_area_color',
 				'label'        => 'タブの色',
 				'name'         => 'area_color',
 				'type'         => 'color_picker',
-							),
+			),
+			array(
+				'key'          => 'field_area_color_light1',
+				'label'        => '薄い色①',
+				'name'         => 'area_color_light1',
+				'type'         => 'color_picker',
+				'instructions' => '一覧の「関連資料」の背景（空欄ならタブの色から自動で作ります）',
+			),
+			array(
+				'key'          => 'field_area_color_light2',
+				'label'        => '薄い色②',
+				'name'         => 'area_color_light2',
+				'type'         => 'color_picker',
+				'instructions' => '一覧の「発達ステップ」の背景（空欄ならタブの色から自動で作ります）',
+			),
+			array(
+				'key'          => 'field_area_list_heading',
+				'label'        => '一覧の見出し',
+				'name'         => 'list_heading',
+				'type'         => 'text',
+				'instructions' => '例：指先の活動（空欄なら領域名を表示）',
+			),
+			array(
+				'key'          => 'field_area_step_title',
+				'label'        => 'ステップの見出し',
+				'name'         => 'step_title',
+				'type'         => 'text',
+				'placeholder'  => '発達ステップ',
+				'instructions' => '一覧のステップ欄の見出し（空欄なら「発達ステップ」）。ステップの中身は「発達段階」で、表示する領域にこの領域を選んだものが並びます',
+			),
+			array(
+				'key'          => 'field_area_links',
+				'label'        => '関連資料',
+				'name'         => 'area_links',
+				'type'         => 'repeater',
+				'layout'       => 'table',
+				'button_label' => '資料を追加',
+				'instructions' => '一覧の右上「関連資料」に並ぶリンク（別タブで開きます）。1件もなければ「関連資料」欄は表示しません',
+				'sub_fields'   => array(
+					array(
+						'key'   => 'field_area_links_label',
+						'label' => 'リンクの文字',
+						'name'  => 'label',
+						'type'  => 'text',
+					),
+					array(
+						'key'   => 'field_area_links_url',
+						'label' => 'URL',
+						'name'  => 'url',
+						'type'  => 'url',
+					),
+				),
+			),
 		),
 	) );
 
@@ -278,6 +338,14 @@ add_action( 'acf/include_fields', function () {
 		'title'    => '発達段階の表示設定',
 		'location' => array( array( array( 'param' => 'taxonomy', 'operator' => '==', 'value' => 'stage' ) ) ),
 		'fields'   => array(
+			array(
+				'key'          => 'field_stage_order',
+				'label'        => '順番',
+				'name'         => 'order',
+				'type'         => 'number',
+				'step'         => 1,
+				'instructions' => '発達ステップ・タブの並び順。小さい数字ほど左（01側）に表示されます（空欄は最後）',
+			),
 			array(
 				'key'           => 'field_stage_area',
 				'label'         => '表示する領域',
@@ -290,7 +358,7 @@ add_action( 'acf/include_fields', function () {
 				'save_terms'    => 0,
 				'load_terms'    => 0,
 				'return_format' => 'id',
-				'instructions'  => '一覧のタブ（例：にぎる・つまむ期）として表示する領域。親の発達段階のみ設定してください',
+				'instructions'  => '一覧の「発達ステップ」とタブ（例：握る）に表示する領域。親の発達段階のみ設定してください。並び順は「順番」で決まります',
 			),
 		),
 	) );

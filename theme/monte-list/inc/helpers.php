@@ -29,8 +29,9 @@ add_action( 'pre_get_posts', function ( WP_Query $q ) {
 
 	$f         = monte_filters();
 	$tax_query = array();
-	if ( $f['period'] ) {
-		$tax_query[] = array( 'taxonomy' => 'stage', 'field' => 'slug', 'terms' => $f['period'] );
+	$period    = $q->is_search() ? $f['period'] : monte_current_period();
+	if ( $period ) {
+		$tax_query[] = array( 'taxonomy' => 'stage', 'field' => 'slug', 'terms' => $period );
 	}
 	if ( $f['hand'] ) {
 		$tax_query[] = array( 'taxonomy' => 'hand_motion', 'field' => 'slug', 'terms' => $f['hand'] );
@@ -52,6 +53,24 @@ add_action( 'pre_get_posts', function ( WP_Query $q ) {
 			array( 'key' => 'video_url', 'value' => '' ),
 		) );
 	}
+} );
+
+// 「すべて」タブは廃止。トップ（/）は最初の領域タブへ移動する（検索結果はそのまま）。
+add_action( 'template_redirect', function () {
+	if ( ! is_home() || is_search() ) {
+		return;
+	}
+	$first = monte_top_areas()[0] ?? null;
+	if ( ! $first ) {
+		return;
+	}
+	$link = get_term_link( $first );
+	if ( is_wp_error( $link ) ) {
+		return;
+	}
+	$args = array_map( 'rawurlencode_deep', wp_unslash( $_GET ) ); // phpcs:ignore WordPress.Security.NonceVerification
+	wp_safe_redirect( add_query_arg( $args, $link ), 302 );
+	exit;
 } );
 
 /**
@@ -121,10 +140,72 @@ function monte_current_area(): ?WP_Term {
 	return $term->parent ? get_term( $term->parent, 'area' ) : $term;
 }
 
+/**
+ * タブの名前を出力する。「の」を含む名前は「の」の後ろで2行にする（例: 日常生活の / 練習）。
+ */
+function monte_area_tab_label( string $name ): string {
+	$pos = mb_strrpos( $name, 'の' );
+	if ( false === $pos || $pos === mb_strlen( $name ) - 1 ) {
+		return esc_html( $name );
+	}
+	return sprintf(
+		'<span class="area-tab__part">%s</span><span class="area-tab__part">%s</span>',
+		esc_html( mb_substr( $name, 0, $pos + 1 ) ),
+		esc_html( mb_substr( $name, $pos + 1 ) )
+	);
+}
+
+/**
+ * 表示中の発達段階タブ（slug）。「すべて」タブはないため、
+ * 未指定・この領域にない段階なら最初の段階にする。段階のない領域は空。
+ */
+function monte_current_period(): string {
+	$area = monte_current_area();
+	if ( ! $area ) {
+		return '';
+	}
+	$slugs = wp_list_pluck( monte_area_stages( $area->term_id ), 'slug' );
+	if ( ! $slugs ) {
+		return '';
+	}
+	$period = monte_filters()['period'];
+	return in_array( $period, $slugs, true ) ? $period : $slugs[0];
+}
+
 function monte_area_color( WP_Term $term ): string {
 	$top   = $term->parent ? get_term( $term->parent, 'area' ) : $term;
 	$color = function_exists( 'get_field' ) ? get_field( 'area_color', $top ) : '';
 	return $color ?: '#b89383';
+}
+
+/** 一覧のパネル背景用の薄い色（1 or 2）。未設定なら空文字（CSS 側でタブの色から作る）。 */
+function monte_area_light( WP_Term $area, int $n ): string {
+	return function_exists( 'get_field' ) ? (string) get_field( "area_color_light{$n}", $area ) : '';
+}
+
+/** 一覧の見出し（未入力なら領域名）。 */
+function monte_area_heading( WP_Term $area ): string {
+	$heading = function_exists( 'get_field' ) ? trim( (string) get_field( 'list_heading', $area ) ) : '';
+	return $heading ?: $area->name;
+}
+
+/** 一覧のステップ欄の見出し（未入力なら「発達ステップ」）。 */
+function monte_area_step_title( WP_Term $area ): string {
+	$title = function_exists( 'get_field' ) ? trim( (string) get_field( 'step_title', $area ) ) : '';
+	return $title ?: '発達ステップ';
+}
+
+/** 一覧の「関連資料」リンク。[ [label, url], ... ]（未入力なら空） */
+function monte_area_links( ?WP_Term $area ): array {
+	$rows  = $area && function_exists( 'get_field' ) ? get_field( 'area_links', $area ) : array();
+	$links = array();
+	foreach ( is_array( $rows ) ? $rows : array() as $row ) {
+		$label = trim( (string) ( $row['label'] ?? '' ) );
+		if ( '' !== $label ) {
+			$links[] = array( $label, (string) ( $row['url'] ?? '' ) );
+		}
+	}
+	return $links;
 }
 
 /** 記事に付いた分類のうち1つを返す（prefer_child: 子を優先）。 */
