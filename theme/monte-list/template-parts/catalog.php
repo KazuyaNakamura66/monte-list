@@ -76,7 +76,7 @@ if ( $current_top ) {
 						<p class="guide__title"><?php echo esc_html( monte_area_step_title( $current_top ) ); ?></p>
 						<ol class="steps">
 							<?php foreach ( $stages as $i => $stage ) : ?>
-								<li class="steps__item<?php echo $period === $stage->slug ? ' is-active' : ''; ?>">
+								<li class="steps__item">
 									<span class="steps__num"><?php echo esc_html( sprintf( '%02d', $i + 1 ) ); ?></span>
 									<span class="steps__label"><?php echo esc_html( $stage->name ); ?></span>
 								</li>
