@@ -165,14 +165,16 @@ button { font: inherit; color: inherit; }
 	scrollbar-width: none;
 }
 .steps::-webkit-scrollbar { display: none; }
-.steps__item { position: relative; flex: 1 1 0; min-width: 120px; max-width: 170px; }
-.steps__item a {
+.steps__item {
+	position: relative;
+	flex: 1 1 0;
+	min-width: 120px;
+	max-width: 170px;
 	display: flex;
 	flex-direction: column;
 	align-items: center; /* 番号の丸と文字を左右中央に */
 	gap: 8px;
 	padding: 0 4px;
-	text-decoration: none;
 	font-size: 14px;
 	text-align: center;
 }
@@ -206,7 +208,6 @@ button { font: inherit; color: inherit; }
 	letter-spacing: 0.04em;
 }
 .steps__item.is-active .steps__num { box-shadow: 0 0 0 3px color-mix(in srgb, var(--area-color) 30%, #fff); }
-.steps__item a:hover .steps__label { text-decoration: underline; text-underline-offset: 3px; }
 
 .doc-links { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .guide--single .doc-links { flex-direction: row; flex-wrap: wrap; }
@@ -215,10 +216,10 @@ button { font: inherit; color: inherit; }
 	align-items: center;
 	justify-content: space-between;
 	gap: 12px;
-	padding: 4px 10px 4px 14px;
+	padding: 6px 12px 6px 16px;
 	background: #fff;
 	border-radius: 999px;
-	font-size: 12px;
+	font-size: 14px;
 	text-decoration: none;
 }
 .guide--single .doc-link { min-width: 220px; }
@@ -370,6 +371,9 @@ button { font: inherit; color: inherit; }
 	box-shadow: 0 20px 60px rgba(40, 30, 20, .2);
 }
 .filter-dialog::backdrop { background: rgba(60, 60, 60, .45); }
+/* 絞り込みを開いている間は後ろのページをスクロールさせない（スクロールバー分の幅は確保してずれを防ぐ） */
+html:has(.filter-dialog[open]) { overflow: hidden; scrollbar-gutter: stable; }
+.filter-dialog { overscroll-behavior: contain; }
 
 .filter { padding: 28px 34px 30px; }
 .filter__header { display: flex; align-items: center; justify-content: space-between; }
@@ -446,7 +450,7 @@ button { font: inherit; color: inherit; }
 	letter-spacing: 0.08em;
 	cursor: pointer;
 }
-.btn--outline { background: #fff; border: 1.5px solid var(--c-accent); color: var(--c-text); }
+.btn--outline { background: #fff; border: 1.5px solid var(--c-accent); color: var(--c-accent); }
 .btn--primary { background: var(--c-accent); border: 1.5px solid var(--c-accent); color: #fff; }
 .btn--primary:hover { background: #a25b3e; }
 

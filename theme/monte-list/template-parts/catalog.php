@@ -77,10 +77,8 @@ if ( $current_top ) {
 						<ol class="steps">
 							<?php foreach ( $stages as $i => $stage ) : ?>
 								<li class="steps__item<?php echo $period === $stage->slug ? ' is-active' : ''; ?>">
-									<a href="<?php echo esc_url( add_query_arg( array_merge( $keep, array( 'period' => $stage->slug ) ), $base_url ) ); ?>">
-										<span class="steps__num"><?php echo esc_html( sprintf( '%02d', $i + 1 ) ); ?></span>
-										<span class="steps__label"><?php echo esc_html( $stage->name ); ?></span>
-									</a>
+									<span class="steps__num"><?php echo esc_html( sprintf( '%02d', $i + 1 ) ); ?></span>
+									<span class="steps__label"><?php echo esc_html( $stage->name ); ?></span>
 								</li>
 							<?php endforeach; ?>
 						</ol>
