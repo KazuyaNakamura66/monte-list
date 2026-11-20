@@ -6,6 +6,10 @@
 $post_id  = get_the_ID();
 $tag      = monte_card_tag( $post_id );
 $subtitle = monte_card_subtitle( $post_id );
+$link     = get_permalink();
+if ( ! empty( $args['period'] ) ) {
+	$link = add_query_arg( 'period', $args['period'], $link ); // 開いていたサブカテゴリーのタブ
+}
 ?>
 <article class="card" data-areas="<?php echo esc_attr( implode( ' ', monte_post_area_slugs( $post_id ) ) ); ?>">
 	<div class="card__media">
@@ -21,9 +25,9 @@ $subtitle = monte_card_subtitle( $post_id );
 	</div>
 
 	<div class="card__body">
-		<h3 class="card__title"><a class="card__link" href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
+		<h3 class="card__title"><a class="card__link" href="<?php echo esc_url( $link ); ?>"><?php the_title(); ?></a></h3>
 		<?php if ( $subtitle ) : ?>
-			<p class="card__subtitle"><?php echo esc_html( $subtitle ); ?></p>
+			<p class="card__subtitle" title="<?php echo esc_attr( $subtitle ); ?>"><?php echo esc_html( $subtitle ); ?></p>
 		<?php endif; ?>
 	</div>
 

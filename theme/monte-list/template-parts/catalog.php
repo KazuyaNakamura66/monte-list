@@ -9,7 +9,7 @@ $filters     = monte_filters();
 $top_areas = monte_top_areas();
 $stages    = $current_top ? monte_area_stages( $current_top->term_id ) : array();
 $links     = $current_top ? monte_area_links( $current_top ) : array(); // 関連資料
-$period    = monte_current_period(); // 選択中のサブカテゴリー（未指定なら最初の段階）
+$period    = monte_current_period(); // 選択中のサブカテゴリー（空なら「すべて」）
 
 // タブ・絞り込みの基準URL（ページ番号なし）
 $base_url = $current_top ? get_term_link( $current_top ) : home_url( '/' );
@@ -89,6 +89,8 @@ get_template_part( 'template-parts/catalog-hero', null, array(
 		<div class="subbar">
 			<?php if ( $stages ) : ?>
 				<nav class="sub-tabs" aria-label="サブカテゴリー">
+					<a class="sub-tab<?php echo '' === $period ? ' is-active' : ''; ?>"
+						href="<?php echo esc_url( add_query_arg( $keep, $base_url ) ); ?>">すべて</a>
 					<?php foreach ( $stages as $stage ) : ?>
 						<a class="sub-tab<?php echo $period === $stage->slug ? ' is-active' : ''; ?>"
 							href="<?php echo esc_url( add_query_arg( array_merge( $keep, array( 'period' => $stage->slug ) ), $base_url ) ); ?>"><?php echo esc_html( $stage->name ); ?></a>
@@ -112,7 +114,8 @@ get_template_part( 'template-parts/catalog-hero', null, array(
 				<?php
 				while ( have_posts() ) :
 					the_post();
-					get_template_part( 'template-parts/card' );
+					// 記事ページのパンくずを、開いているタブに揃えるため
+					get_template_part( 'template-parts/card', null, array( 'period' => $current_top && ! is_search() ? $period : '' ) );
 				endwhile;
 				?>
 			</div>

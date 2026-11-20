@@ -163,8 +163,8 @@ function monte_area_tab_label( string $name ): string {
 }
 
 /**
- * 表示中のサブカテゴリー（slug）。「すべて」タブはないため、
- * 未指定・このカテゴリーにない段階なら最初の段階にする。段階のないカテゴリーは空。
+ * 表示中のサブカテゴリー（slug）。
+ * 未指定・このカテゴリーにない段階なら空（＝「すべて」タブ）。
  */
 function monte_current_period(): string {
 	$area = monte_current_area();
@@ -176,7 +176,7 @@ function monte_current_period(): string {
 		return '';
 	}
 	$period = monte_filters()['period'];
-	return in_array( $period, $slugs, true ) ? $period : $slugs[0];
+	return in_array( $period, $slugs, true ) ? $period : '';
 }
 
 function monte_area_color( WP_Term $term ): string {
@@ -254,6 +254,38 @@ function monte_post_area_slugs( int $post_id ): array {
 }
 
 /**
+ * 記事が入っているサブカテゴリーのタブ（カテゴリー一覧の上の段）。
+ * 一覧から ?period= 付きで開いたときは、そのタブを優先する（複数のサブカテゴリーに登録された記事用）。
+ */
+function monte_post_tab( int $post_id, bool $fallback = true ): ?WP_Term {
+	$area = monte_post_area( $post_id );
+	if ( ! $area ) {
+		return null;
+	}
+	$stage_ids = wp_get_post_terms( $post_id, 'stage', array( 'fields' => 'ids' ) );
+	$stage_ids = is_wp_error( $stage_ids ) ? array() : array_map( 'intval', $stage_ids );
+
+	$matches = array();
+	foreach ( monte_area_stages( $area->term_id ) as $tab ) {
+		$tab_ids = array_merge( array( $tab->term_id ), get_term_children( $tab->term_id, 'stage' ) );
+		if ( array_intersect( $tab_ids, $stage_ids ) ) {
+			$matches[ $tab->slug ] = $tab;
+		}
+	}
+	$period = monte_filters()['period'];
+	if ( isset( $matches[ $period ] ) ) {
+		return $matches[ $period ];
+	}
+	// 「すべて」タブなどから開いたとき。$fallback なら最初に当てはまるタブ（パンくず用）。
+	return $fallback ? ( reset( $matches ) ?: null ) : null;
+}
+
+/** 記事ページで ?period= を引き継ぐ URL（前後の記事へ移っても同じタブのまま）。 */
+function monte_with_tab( string $url, ?WP_Term $tab ): string {
+	return $tab ? add_query_arg( 'period', $tab->slug, $url ) : $url;
+}
+
+/**
  * 一覧で前後に並ぶ記事の ID。同じカテゴリー・同じサブカテゴリーのタブの中を、一覧と同じ順で移動する。
  *
  * @return array{prev: int, next: int} ない場合は 0
@@ -263,15 +295,9 @@ function monte_adjacent_posts( int $post_id ): array {
 	$area      = monte_post_area( $post_id );
 	if ( $area ) {
 		$tax_query[] = array( 'taxonomy' => 'area', 'field' => 'term_id', 'terms' => $area->term_id );
-
-		$stage_ids = wp_get_post_terms( $post_id, 'stage', array( 'fields' => 'ids' ) );
-		$stage_ids = is_wp_error( $stage_ids ) ? array() : array_map( 'intval', $stage_ids );
-		foreach ( monte_area_stages( $area->term_id ) as $tab ) {
-			$tab_ids = array_merge( array( $tab->term_id ), get_term_children( $tab->term_id, 'stage' ) );
-			if ( array_intersect( $tab_ids, $stage_ids ) ) {
-				$tax_query[] = array( 'taxonomy' => 'stage', 'field' => 'term_id', 'terms' => $tab->term_id );
-				break;
-			}
+		$tab         = monte_post_tab( $post_id, false ); // 「すべて」から開いたときはカテゴリー全体で移動
+		if ( $tab ) {
+			$tax_query[] = array( 'taxonomy' => 'stage', 'field' => 'term_id', 'terms' => $tab->term_id );
 		}
 	}
 
@@ -300,11 +326,29 @@ function monte_card_tag( int $post_id ): string {
 	return $term ? $term->name : '';
 }
 
-/** カードのサブタイトル（サブカテゴリー → なければキャッチコピー）。 */
+/**
+ * カードのサブタイトル（サブカテゴリー → なければキャッチコピー）。
+ * サブカテゴリーが複数あるときは「五感で感じる・仲間分けする」のように一覧のタブ順でつなぐ。
+ * 下の階層に登録されていれば、上の階層は省いて一番下の名前を出す。
+ */
 function monte_card_subtitle( int $post_id ): string {
-	$term = monte_post_term( $post_id, 'stage' );
-	if ( $term ) {
-		return $term->name;
+	$terms = wp_get_post_terms( $post_id, 'stage' );
+	$terms = is_wp_error( $terms ) ? array() : $terms;
+	if ( $terms ) {
+		$ids     = wp_list_pluck( $terms, 'term_id' );
+		$parents = array();
+		foreach ( $ids as $id ) {
+			$parents = array_merge( $parents, get_ancestors( $id, 'stage', 'taxonomy' ) );
+		}
+		$area  = monte_post_area( $post_id );
+		$order = $area ? array_flip( wp_list_pluck( monte_area_stages( $area->term_id ), 'term_id' ) ) : array();
+		$rank  = function ( WP_Term $t ) use ( $order ): int {
+			$root = get_ancestors( $t->term_id, 'stage', 'taxonomy' );
+			return $order[ $root ? end( $root ) : $t->term_id ] ?? PHP_INT_MAX;
+		};
+		$leaves = array_values( array_filter( $terms, fn( $t ) => ! in_array( $t->term_id, $parents, true ) ) );
+		usort( $leaves, fn( $a, $b ) => $rank( $a ) <=> $rank( $b ) );
+		return implode( '・', wp_list_pluck( $leaves, 'name' ) );
 	}
 	return function_exists( 'get_field' ) ? (string) get_field( 'catch', $post_id ) : '';
 }

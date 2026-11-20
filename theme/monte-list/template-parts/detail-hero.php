@@ -6,8 +6,19 @@
 $post_id = get_the_ID();
 $top     = monte_post_area( $post_id );
 $motion  = monte_post_term( $post_id, 'hand_motion', false );
-$stage   = monte_post_term( $post_id, 'stage' );
-$stage_p = $stage && $stage->parent ? get_term( $stage->parent, 'stage' ) : null;
+$tab     = monte_post_tab( $post_id ); // 開いたタブ（なければ最初に当てはまるタブ）
+
+// タブの下の階層にも登録されていれば、その一番下の階層まで表示する。
+$tab_path = $tab ? array( $tab ) : array();
+if ( $tab ) {
+	foreach ( wp_get_post_terms( $post_id, 'stage' ) as $term ) {
+		$path = array_reverse( array_map( fn( $id ) => get_term( $id, 'stage' ), get_ancestors( $term->term_id, 'stage', 'taxonomy' ) ) );
+		$path[] = $term;
+		if ( $path[0]->term_id === $tab->term_id && count( $path ) > count( $tab_path ) ) {
+			$tab_path = $path;
+		}
+	}
+}
 
 // 入手方法は登録順（購入 → レンタル → 手作り）で並べる。
 $acquire   = wp_get_post_terms( $post_id, 'acquire', array( 'orderby' => 'term_id' ) );
@@ -17,15 +28,13 @@ $lead      = get_field( 'lead' );
 $guideline = get_field( 'guideline' );
 $recommend = monte_list_items( get_field( 'recommend' ) );
 
-$crumbs = array_filter( array( $top, $stage_p, $stage ) );
+$crumbs = array_filter( array_merge( array( $top ), $tab_path ) );
 
-// サブカテゴリー（その下の階層も）は、カテゴリー一覧の該当サブカテゴリーのタブへ。
+// サブカテゴリー（その下の階層も）は、カテゴリー一覧の開いたタブへ。
 $top_url   = $top ? get_term_link( $top ) : '';
-$stage_ids = $stage ? get_ancestors( $stage->term_id, 'stage', 'taxonomy' ) : array();
-$stage_top = $stage_ids ? get_term( end( $stage_ids ), 'stage' ) : $stage;
-$crumb_url = function ( WP_Term $crumb ) use ( $top_url, $stage_top ): string {
-	if ( 'stage' === $crumb->taxonomy && $top_url && ! is_wp_error( $top_url ) && $stage_top instanceof WP_Term ) {
-		return add_query_arg( 'period', $stage_top->slug, $top_url );
+$crumb_url = function ( WP_Term $crumb ) use ( $top_url, $tab ): string {
+	if ( 'stage' === $crumb->taxonomy && $top_url && ! is_wp_error( $top_url ) ) {
+		return monte_with_tab( $top_url, $tab );
 	}
 	$link = get_term_link( $crumb );
 	return is_wp_error( $link ) ? '' : $link;

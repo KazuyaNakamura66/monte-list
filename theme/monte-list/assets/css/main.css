@@ -442,6 +442,10 @@ button {
   margin: 6px 0 0;
   font-size: 13px;
   color: var(--c-muted);
+  /* 1行に収まらないときは「...」で省略する */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ---------- ブックマーク ---------- */

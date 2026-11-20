@@ -53,11 +53,12 @@ function monte_area_meta_box( WP_Post $post ): void {
 }
 
 /** サブカテゴリー・ラベルのチェックボックス（子の段階は親の下に字下げして出す）。 */
-function monte_term_checklist( string $taxonomy, array $terms, array $checked, bool $can_assign ): void {
+function monte_term_checklist( string $taxonomy, array $terms, array $checked, bool $can_assign, string $type = 'checkbox' ): void {
 	echo '<ul class="monte-stage-list">';
 	foreach ( $terms as $term ) {
 		printf(
-			'<li><label><input type="checkbox" name="tax_input[%s][]" value="%d"%s%s> %s</label>',
+			'<li><label><input type="%s" name="tax_input[%s][]" value="%d"%s%s> %s</label>',
+			esc_attr( $type ),
 			esc_attr( $taxonomy ),
 			(int) $term->term_id,
 			checked( in_array( $term->term_id, $checked, true ), true, false ),
@@ -66,7 +67,7 @@ function monte_term_checklist( string $taxonomy, array $terms, array $checked, b
 		);
 		$children = monte_sorted_terms( array( 'taxonomy' => $taxonomy, 'parent' => $term->term_id ) );
 		if ( $children ) {
-			monte_term_checklist( $taxonomy, $children, $checked, $can_assign );
+			monte_term_checklist( $taxonomy, $children, $checked, $can_assign, $type );
 		}
 		echo '</li>';
 	}
@@ -77,7 +78,7 @@ function monte_term_checklist( string $taxonomy, array $terms, array $checked, b
  * 編集画面のサブカテゴリー・ラベルの欄。選択中のカテゴリーのものだけを表示する。
  * 他のカテゴリーの欄は無効にしてあるので、保存されない。
  */
-function monte_area_terms_meta_box( WP_Post $post, string $taxonomy, callable $terms_for_area ): void {
+function monte_area_terms_meta_box( WP_Post $post, string $taxonomy, callable $terms_for_area, string $type = 'checkbox' ): void {
 	static $script_printed = false;
 
 	$areas = monte_top_areas();
@@ -96,7 +97,7 @@ function monte_area_terms_meta_box( WP_Post $post, string $taxonomy, callable $t
 		printf( '<fieldset class="monte-stage-group" data-stage-area="%s" data-required-label="%s"%s>', esc_attr( $area->slug ), esc_attr( $object->labels->name ), $selected === $area->slug ? '' : ' hidden disabled' );
 		printf( '<legend class="screen-reader-text">%sの%s</legend>', esc_html( $area->name ), esc_html( $object->labels->name ) );
 		if ( $terms ) {
-			monte_term_checklist( $taxonomy, $terms, $checked, $can_assign );
+			monte_term_checklist( $taxonomy, $terms, $checked, $can_assign, $type );
 		} else {
 			printf( '<p>このカテゴリーの%sはありません。</p>', esc_html( $object->labels->name ) );
 		}
@@ -110,6 +111,7 @@ function monte_area_terms_meta_box( WP_Post $post, string $taxonomy, callable $t
 	?>
 	<script>
 		(() => {
+			const choice = "input:is([type=checkbox], [type=radio])";
 			const clearError = (group) => group.querySelector(".monte-required-message")?.remove();
 
 			document.addEventListener("click", (e) => {
@@ -137,7 +139,7 @@ function monte_area_terms_meta_box( WP_Post $post, string $taxonomy, callable $t
 			document.addEventListener("submit", (e) => {
 				if (e.target.id !== "post" || e.submitter?.id !== "publish") return;
 				const missing = [...document.querySelectorAll("[data-stage-area]:not([hidden])")].filter(
-					(group) => group.querySelector("input[type=checkbox]") && !group.querySelector("input[type=checkbox]:checked")
+					(group) => group.querySelector(choice) && !group.querySelector(`${choice}:checked`)
 				);
 				missing.forEach((group) => {
 					clearError(group);
@@ -150,7 +152,7 @@ function monte_area_terms_meta_box( WP_Post $post, string $taxonomy, callable $t
 				if (missing.length) {
 					e.preventDefault();
 					missing[0].closest(".postbox")?.scrollIntoView({ block: "center" });
-					missing[0].querySelector("input[type=checkbox]").focus({ preventScroll: true });
+					missing[0].querySelector(choice).focus({ preventScroll: true });
 				}
 			}, true);
 		})();
@@ -226,7 +228,7 @@ function monte_stage_meta_box( WP_Post $post ): void {
 }
 
 function monte_motion_meta_box( WP_Post $post ): void {
-	monte_area_terms_meta_box( $post, 'hand_motion', 'monte_area_motions' );
+	monte_area_terms_meta_box( $post, 'hand_motion', 'monte_area_motions', 'radio' ); // ラベルは1つだけ
 }
 
 // 左メニューの「サブカテゴリー」「ラベル」は、開いたカテゴリーのものだけを一覧にする。
