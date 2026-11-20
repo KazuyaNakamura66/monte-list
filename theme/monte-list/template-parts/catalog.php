@@ -9,7 +9,7 @@ $filters     = monte_filters();
 $top_areas = monte_top_areas();
 $stages    = $current_top ? monte_area_stages( $current_top->term_id ) : array();
 $links     = $current_top ? monte_area_links( $current_top ) : array(); // 関連資料
-$period    = monte_current_period(); // 選択中の発達段階タブ（未指定なら最初の段階）
+$period    = monte_current_period(); // 選択中のサブカテゴリー（未指定なら最初の段階）
 
 // タブ・絞り込みの基準URL（ページ番号なし）
 $base_url = $current_top ? get_term_link( $current_top ) : home_url( '/' );
@@ -39,31 +39,20 @@ if ( $current_top ) {
 	}
 }
 ?>
-<header class="catalog-hero">
-	<div class="container catalog-hero__inner">
-		<a class="saved-link" href="<?php echo esc_url( monte_saved_url() ); ?>">
-			<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16l-5-4-5 4z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-			保存した活動<span class="saved-link__count" data-saved-count hidden></span>
-		</a>
-		<h1 class="catalog-hero__title">
-			<a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php bloginfo( 'name' ); ?></a>
-		</h1>
-		<p class="catalog-hero__sub">ACTIVITY LIBRARY</p>
-
-		<form class="search" role="search" method="get" action="<?php echo esc_url( home_url( '/' ) ); ?>">
-			<label class="screen-reader-text" for="catalog-search">検索</label>
-			<input id="catalog-search" class="search__input" type="search" name="s" value="<?php echo esc_attr( get_search_query() ); ?>" placeholder="活動名・キーワードで検索">
-		</form>
-
-		<nav class="area-tabs" aria-label="領域">
-			<?php foreach ( $top_areas as $area ) : ?>
-				<a class="area-tab<?php echo $current_top && $current_top->term_id === $area->term_id ? ' is-active' : ''; ?>"
-					href="<?php echo esc_url( get_term_link( $area ) ); ?>"
-					style="--area-color:<?php echo esc_attr( monte_area_color( $area ) ); ?>"><?php echo monte_area_tab_label( $area->name ); // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
-			<?php endforeach; ?>
-		</nav>
-	</div>
-</header>
+<?php
+get_template_part( 'template-parts/catalog-hero', null, array(
+	'tabs' => array_map(
+		fn( WP_Term $area ) => array(
+			'slug'   => $area->slug,
+			'label'  => monte_area_tab_label( $area->name ),
+			'url'    => get_term_link( $area ),
+			'color'  => monte_area_color( $area ),
+			'active' => $current_top && $current_top->term_id === $area->term_id,
+		),
+		$top_areas
+	),
+) );
+?>
 
 <main class="catalog" style="<?php echo esc_attr( $area_style ); ?>">
 	<div class="container">
@@ -99,7 +88,7 @@ if ( $current_top ) {
 
 		<div class="subbar">
 			<?php if ( $stages ) : ?>
-				<nav class="sub-tabs" aria-label="発達段階">
+				<nav class="sub-tabs" aria-label="サブカテゴリー">
 					<?php foreach ( $stages as $stage ) : ?>
 						<a class="sub-tab<?php echo $period === $stage->slug ? ' is-active' : ''; ?>"
 							href="<?php echo esc_url( add_query_arg( array_merge( $keep, array( 'period' => $stage->slug ) ), $base_url ) ); ?>"><?php echo esc_html( $stage->name ); ?></a>

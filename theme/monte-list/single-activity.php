@@ -9,11 +9,13 @@ get_template_part( 'template-parts/site-header' );
 while ( have_posts() ) :
 	the_post();
 
+	$aim          = get_field( 'aim' );
 	$overview     = get_field( 'overview' );
-	$template_url   = (string) ( get_field( 'template_pdf' ) ?: get_field( 'template_url' ) ); // PDF優先
+	$template_url  = (string) ( get_field( 'template_pdf' ) ?: get_field( 'template_url' ) ); // PDF優先
 	$template_label = trim( (string) get_field( 'template_label' ) ) ?: 'ダウンロードする';
 	$materials    = get_field( 'materials' ) ?: array();
 	$mat_image    = get_field( 'materials_image' );
+	$howto        = monte_list_items( get_field( 'howto' ) );
 	$presentation = get_field( 'presentation' );
 	$video_url    = get_field( 'video_url' );
 	$levelup      = monte_list_items( get_field( 'levelup' ) );
@@ -23,10 +25,20 @@ while ( have_posts() ) :
 
 		<div class="container">
 			<div class="detail-body">
-				<?php if ( $overview ) : ?>
+				<?php if ( $aim || $overview ) : ?>
 					<section class="detail-section">
 						<h2 class="detail-section__label">活動の概要</h2>
-						<div class="detail-section__content prose"><?php echo wp_kses_post( $overview ); ?></div>
+						<div class="detail-section__content">
+							<?php if ( $aim ) : ?>
+								<div class="purpose">
+									<span class="purpose__label">目的</span>
+									<p class="purpose__text"><?php echo esc_html( $aim ); ?></p>
+								</div>
+							<?php endif; ?>
+							<?php if ( $overview ) : ?>
+								<div class="prose"><?php echo wp_kses_post( $overview ); ?></div>
+							<?php endif; ?>
+						</div>
 					</section>
 				<?php endif; ?>
 
@@ -60,6 +72,19 @@ while ( have_posts() ) :
 									<div class="materials__image"><?php echo wp_get_attachment_image( $mat_image, 'monte-card', false, array( 'alt' => '' ) ); ?></div>
 								<?php endif; ?>
 							</div>
+						</div>
+					</section>
+				<?php endif; ?>
+
+				<?php if ( $howto ) : ?>
+					<section class="detail-section">
+						<h2 class="detail-section__label">作り方</h2>
+						<div class="detail-section__content">
+							<ol class="howto">
+								<?php foreach ( $howto as $step ) : ?>
+									<li><?php echo nl2br( esc_html( $step ) ); ?></li>
+								<?php endforeach; ?>
+							</ol>
 						</div>
 					</section>
 				<?php endif; ?>

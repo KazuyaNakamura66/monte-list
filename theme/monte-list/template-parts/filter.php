@@ -7,12 +7,9 @@
  */
 
 $f       = monte_filters();
-$motions = monte_sorted_terms( array( 'taxonomy' => 'hand_motion', 'parent' => 0 ) );
+$area    = monte_current_area();
+$motions = monte_area_motions( $area ? $area->term_id : null ); // 検索結果ではすべて
 $sources = monte_sorted_terms( array( 'taxonomy' => 'acquire', 'parent' => 0 ) );
-
-$visible_motions = array_slice( $motions, 0, MONTE_MOTION_VISIBLE );
-$more_motions    = array_slice( $motions, MONTE_MOTION_VISIBLE );
-$more_selected   = (bool) array_intersect( wp_list_pluck( $more_motions, 'slug' ), $f['hand'] );
 
 $chip = function ( WP_Term $term, string $name, array $selected ) {
 	?>
@@ -39,22 +36,12 @@ $chip = function ( WP_Term $term, string $name, array $selected ) {
 
 		<?php if ( $motions ) : ?>
 			<fieldset class="filter__group" data-chip-group>
-				<legend class="filter__legend"><?php monte_icon( 'hand' ); ?>手の動き</legend>
+				<legend class="filter__legend"><?php monte_icon( 'hand' ); ?>ラベル</legend>
 				<div class="chips">
 					<button class="chip chip--all" type="button" data-chip-all>すべて</button>
-					<?php foreach ( $visible_motions as $term ) : ?>
+					<?php foreach ( $motions as $term ) : ?>
 						<?php $chip( $term, 'hand', $f['hand'] ); ?>
 					<?php endforeach; ?>
-					<?php if ( $more_motions ) : ?>
-						<button class="chip chip--more" type="button" data-chip-more aria-expanded="<?php echo $more_selected ? 'true' : 'false'; ?>">
-							<span class="chip__face">その他<?php monte_icon( 'chevron', 'chip__chevron' ); ?></span>
-						</button>
-						<div class="chips__more" data-chip-more-list <?php echo $more_selected ? '' : 'hidden'; ?>>
-							<?php foreach ( $more_motions as $term ) : ?>
-								<?php $chip( $term, 'hand', $f['hand'] ); ?>
-							<?php endforeach; ?>
-						</div>
-					<?php endif; ?>
 				</div>
 			</fieldset>
 		<?php endif; ?>

@@ -1,6 +1,6 @@
 <?php
 /**
- * 投稿タイプ（教具・活動）と分類（領域・発達段階・入手方法）。
+ * 投稿タイプ（教具・活動）と分類（カテゴリー・サブカテゴリー・入手方法）。
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -33,27 +33,33 @@ add_action( 'init', function () {
 	$types = array( 'tool', 'activity' );
 
 	register_taxonomy( 'area', $types, array(
-		'labels'            => monte_taxonomy_labels( '領域' ),
-		'hierarchical'      => true,
-		'show_admin_column' => true,
-		'show_in_rest'      => true,
+		'labels'             => monte_taxonomy_labels( 'カテゴリー' ),
+		'hierarchical'       => true,
+		'show_admin_column'  => true,
+		'show_in_rest'       => true,
+		'show_in_quick_edit' => false, // 複数選択の欄になるため出さない
+		'meta_box_cb'        => 'monte_area_meta_box', // 1 記事に 1 カテゴリー
 		'rewrite'           => array( 'slug' => 'area', 'hierarchical' => true ),
 	) );
 
 	register_taxonomy( 'stage', $types, array(
-		'labels'            => monte_taxonomy_labels( '発達段階' ),
-		'hierarchical'      => true,
-		'show_admin_column' => true,
-		'show_in_rest'      => true,
+		'labels'             => monte_taxonomy_labels( 'サブカテゴリー' ),
+		'hierarchical'       => true,
+		'show_admin_column'  => true,
+		'show_in_rest'       => true,
+		'show_in_quick_edit' => false, // カテゴリーごとに絞れないため出さない
+		'meta_box_cb'        => 'monte_stage_meta_box', // 選択中のカテゴリーの段階だけ表示
 		'rewrite'           => array( 'slug' => 'stage', 'hierarchical' => true ),
 	) );
 
 	register_taxonomy( 'hand_motion', $types, array(
-		'labels'            => monte_taxonomy_labels( '手の動き' ),
-		'hierarchical'      => true, // チェックボックスで選べるようにする
-		'show_admin_column' => true,
-		'show_in_rest'      => true,
-		'rewrite'           => array( 'slug' => 'motion' ),
+		'labels'             => monte_taxonomy_labels( 'ラベル' ),
+		'hierarchical'       => true, // チェックボックスで選べるようにする
+		'show_admin_column'  => true,
+		'show_in_rest'       => true,
+		'show_in_quick_edit' => false, // カテゴリーごとに絞れないため出さない
+		'meta_box_cb'        => 'monte_motion_meta_box', // 選択中のカテゴリーのラベルだけ表示
+		'rewrite'            => array( 'slug' => 'motion' ),
 	) );
 
 	register_taxonomy( 'acquire', $types, array(
@@ -88,7 +94,7 @@ function monte_taxonomy_labels( string $name ): array {
 		'singular_name' => $name,
 		'search_items'  => "{$name}を検索",
 		'all_items'     => "すべての{$name}",
-		'parent_item'   => "親の{$name}",
+		'parent_item'   => "上の階層の{$name}",
 		'edit_item'     => "{$name}を編集",
 		'update_item'   => "{$name}を更新",
 		'add_new_item'  => "{$name}を追加",

@@ -1,0 +1,162 @@
+/* 管理画面のサイドメニュー（カテゴリー > 教具・活動 > 一覧・追加・分類） */
+.monte-has-nav #adminmenu #menu-posts-tool,
+.monte-has-nav #adminmenu #menu-posts-activity {
+  display: none;
+}
+
+#adminmenu .monte-nav ul {
+  margin: 0;
+  padding: 0;
+}
+#adminmenu .monte-nav li {
+  margin: 0;
+}
+#adminmenu .monte-nav [hidden] {
+  display: none;
+}
+
+.monte-nav__areas {
+  padding: 6px 0;
+}
+.monte-nav__toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 10px 7px 8px; /* 文字の位置を標準メニューにそろえる */
+  border: 0;
+  background: none;
+  color: #f0f0f1;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+}
+.monte-nav__toggle:hover {
+  color: #72aee6;
+}
+.monte-nav__toggle .dashicons {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+  color: #a7aaad;
+}
+.monte-nav__toggle:hover .dashicons {
+  color: inherit;
+}
+.monte-nav__toggle:focus-visible,
+#adminmenu .monte-nav a:focus-visible {
+  outline: 2px solid #72aee6;
+  outline-offset: -2px;
+  box-shadow: none;
+}
+
+#adminmenu .monte-nav__type-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px 7px 20px;
+  color: #f0f0f1;
+  font-size: 14px;
+  line-height: 1.4;
+}
+#adminmenu .monte-nav__type-link:hover {
+  background: #2c3338;
+  color: #72aee6;
+}
+#adminmenu .monte-nav__type-link .dashicons {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+}
+#adminmenu .monte-nav__type.is-current .monte-nav__type-link {
+  background: var(--wp-admin-theme-color, #2271b1);
+  color: #fff;
+}
+
+#adminmenu .monte-nav__sub {
+  padding: 6px 0;
+  background: #101517;
+}
+#adminmenu .monte-nav__sub a {
+  display: block;
+  padding: 5px 10px 5px 30px;
+  color: rgba(240, 246, 252, 0.7);
+  font-size: 13px;
+  line-height: 1.4;
+}
+#adminmenu .monte-nav__sub a:hover {
+  color: #72aee6;
+}
+#adminmenu .monte-nav__sub a.is-current {
+  color: #fff;
+  font-weight: 500;
+}
+
+/* 編集画面のサブカテゴリー */
+.monte-stage-group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.monte-stage-group[hidden] {
+  display: none;
+}
+.monte-stage-list .monte-stage-list {
+  margin: 6px 0 0 20px;
+}
+
+/* カテゴリーの「すべて」: 教具と活動をまとめた一覧 */
+.monte-all-list .page-title-action {
+  display: none;
+}
+.column-monte_type {
+  width: 56px;
+}
+
+/* 公開時の必須項目 */
+#areadiv .hndle::after,
+#stagediv .hndle::after,
+#hand_motiondiv .hndle::after {
+  content: "必須";
+  margin-left: 8px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: #d63638;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+#areadiv .hndle,
+#stagediv .hndle,
+#hand_motiondiv .hndle {
+  justify-content: flex-start;
+}
+.monte-required-message {
+  margin: 0 0 8px;
+  color: #d63638;
+  font-weight: 500;
+}
+
+/* 折りたたみ時はアイコンだけの標準メニューに戻す */
+.folded #adminmenu .monte-nav {
+  display: none;
+}
+.monte-has-nav.folded #adminmenu #menu-posts-tool,
+.monte-has-nav.folded #adminmenu #menu-posts-activity {
+  display: block;
+}
+@media only screen and (min-width: 783px) and (max-width: 960px) {
+  .auto-fold #adminmenu .monte-nav {
+    display: none;
+  }
+  .monte-has-nav.auto-fold #adminmenu #menu-posts-tool,
+  .monte-has-nav.auto-fold #adminmenu #menu-posts-activity {
+    display: block;
+  }
+}

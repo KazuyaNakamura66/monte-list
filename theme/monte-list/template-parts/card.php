@@ -7,7 +7,7 @@ $post_id  = get_the_ID();
 $tag      = monte_card_tag( $post_id );
 $subtitle = monte_card_subtitle( $post_id );
 ?>
-<article class="card">
+<article class="card" data-areas="<?php echo esc_attr( implode( ' ', monte_post_area_slugs( $post_id ) ) ); ?>">
 	<div class="card__media">
 		<?php if ( has_post_thumbnail() ) : ?>
 			<?php the_post_thumbnail( 'monte-card', array( 'class' => 'card__img', 'alt' => '', 'loading' => 'lazy' ) ); ?>
@@ -17,10 +17,6 @@ $subtitle = monte_card_subtitle( $post_id );
 
 		<?php if ( $tag ) : ?>
 			<span class="card__tag"><?php echo esc_html( $tag ); ?></span>
-		<?php endif; ?>
-
-		<?php if ( monte_has_video( $post_id ) ) : ?>
-			<span class="card__play" aria-label="動画あり"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7l8 5-8 5z" fill="currentColor"/></svg></span>
 		<?php endif; ?>
 	</div>
 

@@ -10,6 +10,8 @@ require_once __DIR__ . '/inc/fields.php';
 require_once __DIR__ . '/inc/default-terms.php';
 require_once __DIR__ . '/inc/noindex.php';
 require_once __DIR__ . '/inc/admin.php';
+require_once __DIR__ . '/inc/admin-menu.php';
+require_once __DIR__ . '/inc/duplicate.php';
 require_once __DIR__ . '/inc/helpers.php';
 require_once __DIR__ . '/inc/icons.php';
 require_once __DIR__ . '/inc/assets.php';
@@ -22,4 +24,7 @@ add_action( 'after_setup_theme', function () {
 	add_theme_support( 'title-tag' );
 	add_theme_support( 'post-thumbnails' );
 	add_theme_support( 'html5', array( 'search-form', 'gallery', 'caption', 'style', 'script' ) );
+
+	// タブごとの RSS リンクは使わない（タイトルに管理用の名前が出るため）。
+	remove_action( 'wp_head', 'feed_links_extra', 3 );
 } );

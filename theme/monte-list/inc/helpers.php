@@ -7,15 +7,13 @@ defined( 'ABSPATH' ) || exit;
 
 const MONTE_POST_TYPES = array( 'activity', 'tool' );
 const MONTE_PER_PAGE   = 9;
-// 絞り込みで「その他」に入れずに最初から見せる手の動きの数
-const MONTE_MOTION_VISIBLE = 10;
 
 add_action( 'after_setup_theme', function () {
 	add_image_size( 'monte-card', 720, 450, true );
 	add_image_size( 'monte-main', 1100, 860, false );
 } );
 
-// 一覧（トップ・領域別・検索）: 教具と活動を9件ずつ、タブと絞り込みの条件で表示する。
+// 一覧（トップ・カテゴリー別・検索）: 教具と活動を9件ずつ、タブと絞り込みの条件で表示する。
 add_action( 'pre_get_posts', function ( WP_Query $q ) {
 	if ( is_admin() || ! $q->is_main_query() ) {
 		return;
@@ -55,9 +53,9 @@ add_action( 'pre_get_posts', function ( WP_Query $q ) {
 	}
 } );
 
-// 「すべて」タブは廃止。トップ（/）は最初の領域タブへ移動する（検索結果はそのまま）。
+// 「すべて」タブは廃止。トップ（/）は最初のカテゴリーへ移動する（検索結果はそのまま）。
 add_action( 'template_redirect', function () {
-	if ( ! is_home() || is_search() ) {
+	if ( ! is_home() || is_search() || get_query_var( 'monte_saved' ) ) {
 		return;
 	}
 	$first = monte_top_areas()[0] ?? null;
@@ -75,7 +73,7 @@ add_action( 'template_redirect', function () {
 
 /**
  * URL から一覧の条件を読む。
- * period=発達段階タブ, hand[]=手の動き, source[]=入手方法, video=yes|no
+ * period=サブカテゴリー, hand[]=ラベル, source[]=入手方法, video=yes|no
  * （taxonomy の query var と名前が被らないようにしている）
  */
 function monte_filters(): array {
@@ -120,15 +118,24 @@ function monte_top_areas(): array {
 	return monte_sorted_terms( array( 'taxonomy' => 'area', 'parent' => 0 ) );
 }
 
-/** 領域のタブに出す発達段階（親の段階のうち、表示する領域が一致するもの）。 */
+/** カテゴリーのタブに出すサブカテゴリー（カテゴリーの段階のうち、表示するカテゴリーが一致するもの）。 */
 function monte_area_stages( int $area_id ): array {
 	$stages = monte_sorted_terms( array( 'taxonomy' => 'stage', 'parent' => 0 ) );
 	return array_values( array_filter( $stages, fn( $t ) => (int) get_field( 'stage_area', $t ) === $area_id ) );
 }
 
-/** 表示中の領域（大分類）。 */
+/** カテゴリーのラベル。null なら、いずれかのカテゴリーに表示するものすべて。 */
+function monte_area_motions( ?int $area_id = null ): array {
+	$motions = monte_sorted_terms( array( 'taxonomy' => 'hand_motion', 'parent' => 0 ) );
+	return array_values( array_filter( $motions, function ( WP_Term $term ) use ( $area_id ) {
+		$areas = array_map( 'intval', (array) get_field( 'motion_area', $term ) );
+		return null === $area_id ? (bool) $areas : in_array( $area_id, $areas, true );
+	} ) );
+}
+
+/** 表示中のカテゴリー（大分類）。 */
 function monte_current_area(): ?WP_Term {
-	// 絞り込み条件があると get_queried_object() は別の分類を返すことがあるため、URL の領域から取る。
+	// 絞り込み条件があると get_queried_object() は別の分類を返すことがあるため、URL のカテゴリーから取る。
 	$slug = get_query_var( 'area' );
 	if ( ! $slug ) {
 		return null;
@@ -156,8 +163,8 @@ function monte_area_tab_label( string $name ): string {
 }
 
 /**
- * 表示中の発達段階タブ（slug）。「すべて」タブはないため、
- * 未指定・この領域にない段階なら最初の段階にする。段階のない領域は空。
+ * 表示中のサブカテゴリー（slug）。「すべて」タブはないため、
+ * 未指定・このカテゴリーにない段階なら最初の段階にする。段階のないカテゴリーは空。
  */
 function monte_current_period(): string {
 	$area = monte_current_area();
@@ -183,7 +190,7 @@ function monte_area_light( WP_Term $area, int $n ): string {
 	return function_exists( 'get_field' ) ? (string) get_field( "area_color_light{$n}", $area ) : '';
 }
 
-/** 一覧の見出し（未入力なら領域名）。 */
+/** 一覧の見出し（未入力ならカテゴリー名）。 */
 function monte_area_heading( WP_Term $area ): string {
 	$heading = function_exists( 'get_field' ) ? trim( (string) get_field( 'list_heading', $area ) ) : '';
 	return $heading ?: $area->name;
@@ -224,7 +231,7 @@ function monte_post_term( int $post_id, string $taxonomy, bool $prefer_child = t
 	return $terms[0];
 }
 
-/** 記事の領域（大分類）。 */
+/** 記事のカテゴリー（大分類）。 */
 function monte_post_area( int $post_id ): ?WP_Term {
 	$term = monte_post_term( $post_id, 'area' );
 	if ( $term && $term->parent ) {
@@ -233,23 +240,73 @@ function monte_post_area( int $post_id ): ?WP_Term {
 	return $term;
 }
 
-/** カード左上のタグ（手の動き → なければ領域）。 */
+/** 記事が属する大分類の slug（お気に入りのタブ切り替え用）。 */
+function monte_post_area_slugs( int $post_id ): array {
+	$terms = get_the_terms( $post_id, 'area' );
+	if ( ! $terms || is_wp_error( $terms ) ) {
+		return array();
+	}
+	$slugs = array_map(
+		fn( WP_Term $t ) => $t->parent ? get_term( $t->parent, 'area' )->slug : $t->slug,
+		$terms
+	);
+	return array_values( array_unique( $slugs ) );
+}
+
+/**
+ * 一覧で前後に並ぶ記事の ID。同じカテゴリー・同じサブカテゴリーのタブの中を、一覧と同じ順で移動する。
+ *
+ * @return array{prev: int, next: int} ない場合は 0
+ */
+function monte_adjacent_posts( int $post_id ): array {
+	$tax_query = array();
+	$area      = monte_post_area( $post_id );
+	if ( $area ) {
+		$tax_query[] = array( 'taxonomy' => 'area', 'field' => 'term_id', 'terms' => $area->term_id );
+
+		$stage_ids = wp_get_post_terms( $post_id, 'stage', array( 'fields' => 'ids' ) );
+		$stage_ids = is_wp_error( $stage_ids ) ? array() : array_map( 'intval', $stage_ids );
+		foreach ( monte_area_stages( $area->term_id ) as $tab ) {
+			$tab_ids = array_merge( array( $tab->term_id ), get_term_children( $tab->term_id, 'stage' ) );
+			if ( array_intersect( $tab_ids, $stage_ids ) ) {
+				$tax_query[] = array( 'taxonomy' => 'stage', 'field' => 'term_id', 'terms' => $tab->term_id );
+				break;
+			}
+		}
+	}
+
+	$ids = array_map( 'intval', get_posts( array(
+		'post_type'      => MONTE_POST_TYPES,
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+		'orderby'        => MONTE_SORT_ORDER,
+		'fields'         => 'ids',
+		'tax_query'      => $tax_query, // phpcs:ignore WordPress.DB.SlowDBQuery
+	) ) );
+
+	$index = array_search( $post_id, $ids, true );
+	if ( false === $index ) {
+		return array( 'prev' => 0, 'next' => 0 );
+	}
+	return array(
+		'prev' => $ids[ $index - 1 ] ?? 0,
+		'next' => $ids[ $index + 1 ] ?? 0,
+	);
+}
+
+/** カード左上のタグ（ラベル → なければカテゴリー）。 */
 function monte_card_tag( int $post_id ): string {
 	$term = monte_post_term( $post_id, 'hand_motion', false ) ?: monte_post_area( $post_id );
 	return $term ? $term->name : '';
 }
 
-/** カードのサブタイトル（発達段階 → なければキャッチコピー）。 */
+/** カードのサブタイトル（サブカテゴリー → なければキャッチコピー）。 */
 function monte_card_subtitle( int $post_id ): string {
 	$term = monte_post_term( $post_id, 'stage' );
 	if ( $term ) {
 		return $term->name;
 	}
 	return function_exists( 'get_field' ) ? (string) get_field( 'catch', $post_id ) : '';
-}
-
-function monte_has_video( int $post_id ): bool {
-	return function_exists( 'get_field' ) && (bool) get_field( 'video_url', $post_id );
 }
 
 function monte_option( string $name ): string {

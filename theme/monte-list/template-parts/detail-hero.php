@@ -18,13 +18,25 @@ $guideline = get_field( 'guideline' );
 $recommend = monte_list_items( get_field( 'recommend' ) );
 
 $crumbs = array_filter( array( $top, $stage_p, $stage ) );
+
+// サブカテゴリー（その下の階層も）は、カテゴリー一覧の該当サブカテゴリーのタブへ。
+$top_url   = $top ? get_term_link( $top ) : '';
+$stage_ids = $stage ? get_ancestors( $stage->term_id, 'stage', 'taxonomy' ) : array();
+$stage_top = $stage_ids ? get_term( end( $stage_ids ), 'stage' ) : $stage;
+$crumb_url = function ( WP_Term $crumb ) use ( $top_url, $stage_top ): string {
+	if ( 'stage' === $crumb->taxonomy && $top_url && ! is_wp_error( $top_url ) && $stage_top instanceof WP_Term ) {
+		return add_query_arg( 'period', $stage_top->slug, $top_url );
+	}
+	$link = get_term_link( $crumb );
+	return is_wp_error( $link ) ? '' : $link;
+};
 ?>
 <div class="container">
 	<?php if ( $crumbs ) : ?>
 		<nav class="breadcrumb" aria-label="パンくずリスト">
 			<ol>
 				<?php foreach ( $crumbs as $crumb ) : ?>
-					<li><a href="<?php echo esc_url( get_term_link( $crumb ) ); ?>"><?php echo esc_html( $crumb->name ); ?></a></li>
+					<li><a href="<?php echo esc_url( $crumb_url( $crumb ) ); ?>"><?php echo esc_html( $crumb->name ); ?></a></li>
 				<?php endforeach; ?>
 			</ol>
 		</nav>
@@ -42,12 +54,11 @@ $crumbs = array_filter( array( $top, $stage_p, $stage ) );
 		<div class="detail-hero__info">
 			<div class="detail-hero__top">
 				<?php if ( $top || $motion ) : ?>
-					<span class="pill">
-						<?php
-						$parts = array_filter( array( $top ? $top->name : '', $motion ? $motion->name : '' ) );
-						echo implode( '<span class="pill__sep" aria-hidden="true"></span>', array_map( 'esc_html', $parts ) ); // phpcs:ignore WordPress.Security.EscapeOutput
-						?>
-					</span>
+					<div class="pills">
+						<?php foreach ( array_filter( array( $top, $motion ) ) as $term ) : ?>
+							<span class="pill"><?php echo esc_html( $term->name ); ?></span>
+						<?php endforeach; ?>
+					</div>
 				<?php else : ?>
 					<span></span>
 				<?php endif; ?>
@@ -79,7 +90,7 @@ $crumbs = array_filter( array( $top, $stage_p, $stage ) );
 
 			<?php if ( $recommend ) : ?>
 				<dl class="detail-hero__row">
-					<dt>こんな子におすすめ</dt>
+					<dt>こんな姿がみられたら</dt>
 					<dd>
 						<ul class="dot-list">
 							<?php foreach ( $recommend as $item ) : ?>

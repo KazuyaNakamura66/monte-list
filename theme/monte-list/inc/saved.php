@@ -1,6 +1,6 @@
 <?php
 /**
- * 保存した活動ページ（/saved/）。
+ * お気に入りページ（/saved/）。
  * 保存先はブラウザ（localStorage）なので、ページ側の JS が ID を送り、
  * カードの HTML を REST API から受け取って表示する。
  */
@@ -33,7 +33,7 @@ add_filter( 'template_include', function ( string $template ): string {
 
 add_filter( 'document_title_parts', function ( array $parts ): array {
 	if ( get_query_var( 'monte_saved' ) ) {
-		$parts['title'] = '保存した活動';
+		$parts['title'] = 'お気に入り';
 	}
 	return $parts;
 } );

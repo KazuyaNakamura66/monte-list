@@ -1,13 +1,13 @@
 <?php
 /**
- * 初期の分類（領域・発達段階・手の動き・入手方法）を登録する。
+ * 初期の分類（カテゴリー・サブカテゴリー・ラベル・入手方法）を登録する。
  * MONTE_TERMS_VERSION を上げると、未適用の分だけ追加で実行される。
  * 名前・色・順番はあとから管理画面で変更できる。
  */
 
 defined( 'ABSPATH' ) || exit;
 
-const MONTE_TERMS_VERSION = 7;
+const MONTE_TERMS_VERSION = 13;
 
 add_action( 'init', function () {
 	$version = (int) get_option( 'monte_terms_version' );
@@ -36,11 +36,29 @@ add_action( 'init', function () {
 	if ( $version < 7 ) {
 		monte_terms_v7();
 	}
+	if ( $version < 8 ) {
+		monte_terms_v8();
+	}
+	if ( $version < 9 ) {
+		monte_terms_v9();
+	}
+	if ( $version < 10 ) {
+		monte_terms_v10();
+	}
+	if ( $version < 11 ) {
+		monte_terms_v11();
+	}
+	if ( $version < 12 ) {
+		monte_terms_v12();
+	}
+	if ( $version < 13 ) {
+		monte_terms_v13();
+	}
 
 	update_option( 'monte_terms_version', MONTE_TERMS_VERSION );
 }, 99 );
 
-/** v1: 領域・入手方法。 */
+/** v1: カテゴリー・入手方法。 */
 function monte_terms_v1(): void {
 	$areas = array(
 		array( 'fine-motor', '微細運動', '#b89383' ),
@@ -65,11 +83,11 @@ function monte_terms_v1(): void {
 
 /**
  * v2: 絞り込みデザインに合わせて整理。
- * - 「握る」などは領域の子ではなく「手の動き」へ
- * - 領域の下のタブは「発達段階」
+ * - 「握る」などはカテゴリーの子ではなく「ラベル」へ
+ * - カテゴリーの下のタブは「サブカテゴリー」
  */
 function monte_terms_v2(): void {
-	// 旧: 領域の子（握る・指先を使う・道具を使う）を削除
+	// 旧: カテゴリーの子（握る・指先を使う・道具を使う）を削除
 	foreach ( array( 'grasp', 'fingers', 'tools' ) as $slug ) {
 		$old = get_term_by( 'slug', $slug, 'area' );
 		if ( $old ) {
@@ -130,7 +148,7 @@ function monte_terms_v2(): void {
  * v3: 一覧デザイン（発達ステップ・関連資料）に合わせて整理。
  * - 「日常生活の練習」を追加し、タブの並びをデザインどおりに
  * - 見出し: 未入力のものだけ初期値を入れる
- * - 粗大運動の発達段階（ねんね期・移動期・歩行期）を追加
+ * - 粗大運動のサブカテゴリー（ねんね期・移動期・歩行期）を追加
  */
 function monte_terms_v3(): void {
 	// slug => [名前, 見出し]
@@ -173,7 +191,7 @@ function monte_terms_v3(): void {
 	}
 }
 
-/** v4: 領域の色を指定のカラーパレット（メイン・薄い色①・薄い色②）にする。 */
+/** v4: カテゴリーの色を指定のカラーパレット（メイン・薄い色①・薄い色②）にする。 */
 function monte_terms_v4(): void {
 	$colors = array(
 		'fine-motor'     => array( '#a99eae', '#e9e4eb', '#f4f1f5' ),
@@ -196,14 +214,14 @@ function monte_terms_v4(): void {
 }
 
 /**
- * v5: 残りの領域のデザイン（見出し・ステップ・関連資料）。
+ * v5: 残りのカテゴリーのデザイン（見出し・ステップ・関連資料）。
  * 見出し・ステップの見出し・関連資料は未入力のときだけ入れる。
  */
 function monte_terms_v5(): void {
 	$timeline = monte_option( 'timeline_url' );
 	$record   = monte_option( 'record_sheet_url' );
 
-	// slug => [見出し, ステップの見出し, 発達段階 [slug => 名前], 関連資料 [[文字, URL]]]
+	// slug => [見出し, ステップの見出し, サブカテゴリー [slug => 名前], 関連資料 [[文字, URL]]]
 	$areas = array(
 		'fine-motor'     => array( '', '', array(), array( array( '微細運動の発達タイムライン', $timeline ), array( '発達記録シート', $record ) ) ),
 		'gross-motor'    => array( '', '', array(), array( array( '粗大運動の発達タイムライン', $timeline ), array( '発達記録シート', $record ) ) ),
@@ -271,7 +289,7 @@ function monte_terms_v6(): void {
 }
 
 /**
- * v7: 微細運動の発達段階の名前をデザインに合わせる（01 握る / 02 指先を使う / 03 道具を使う）。
+ * v7: 微細運動のサブカテゴリーの名前をデザインに合わせる（01 握る / 02 指先を使う / 03 道具を使う）。
  * URL（slug）は変えない。管理画面ですでに名前を変えたものはそのまま。
  */
 function monte_terms_v7(): void {
@@ -284,6 +302,106 @@ function monte_terms_v7(): void {
 		$term = get_term_by( 'slug', $slug, 'stage' );
 		if ( $term && $term->name === $old ) {
 			wp_update_term( $term->term_id, 'stage', array( 'name' => $new ) );
+		}
+	}
+}
+
+/**
+ * v8: 微細運動のラベルを指定の並びにする。
+ * 一覧にないラベル（つまむ・回す）は、記事の設定を残すため削除せず、表示するカテゴリーなしのままにする。
+ */
+function monte_terms_v8(): void {
+	monte_add_area_motions( 'fine-motor', monte_hand_motions() );
+}
+
+/** 微細運動・日常生活の練習で共通のラベル。 [slug => 名前] */
+function monte_hand_motions(): array {
+	return array(
+		'pull'       => 'ひっぱる',
+		'peel'       => '剥がす',
+		'drop'       => '落とす',
+		'fit'        => 'はめる',
+		'inset'      => 'はめ込む',
+		'thread'     => '通す',
+		'push'       => '押す',
+		'twist'      => 'ひねる',
+		'wind'       => '巻く',
+		'both-hands' => '両手を使う',
+		'transfer'   => 'あけ移す',
+		'pour'       => 'そそぐ',
+		'hang'       => '掛ける',
+		'stick'      => '貼る',
+		'tear'       => 'ちぎる',
+		'clip'       => 'はさむ',
+		'fasten'     => 'とめる',
+		'punch'      => '穴あけ',
+		'fold'       => '折る',
+		'scissors'   => 'はさみ切り',
+		'tie-knit'   => '結ぶ・編む',
+		'sew'        => '縫う',
+		'grasp'      => '握る',
+	);
+}
+
+/** v10: 日常生活の練習のラベル（微細運動と同じ）。 */
+function monte_terms_v10(): void {
+	monte_add_area_motions( 'practical-life', monte_hand_motions() );
+}
+
+/** v13: 数教育・文化教育のラベル（共通）。 */
+function monte_terms_v13(): void {
+	foreach ( array( 'math', 'culture' ) as $area_slug ) {
+		monte_add_area_motions( $area_slug, array( 'tab-1' => 'タブ1' ) );
+	}
+}
+
+/** v12: 言語教育のラベル。 */
+function monte_terms_v12(): void {
+	monte_add_area_motions( 'language', array(
+		'word-input'       => '言葉のインプット',
+		'word-recognition' => '言葉の認識が始まったら',
+		'start-talking'    => '話し始めたら',
+		'writing'          => '書く',
+		'reading'          => '読む',
+	) );
+}
+
+/** v11: 感覚教育のラベル。 */
+function monte_terms_v11(): void {
+	monte_add_area_motions( 'sensorial', array(
+		'sight'   => '視覚',
+		'touch'   => '触覚',
+		'hearing' => '聴覚',
+		'smell'   => '嗅覚',
+		'taste'   => '味覚',
+	) );
+}
+
+/** v9: 粗大運動のラベル。 */
+function monte_terms_v9(): void {
+	monte_add_area_motions( 'gross-motor', array(
+		'newborn'        => '生まれてすぐ',
+		'reaching'       => '手を伸ばし始めたら',
+		'moving'         => '移動し始めたら',
+		'walking-start'  => '歩き始めたら',
+		'walking-stable' => '歩行が安定したら',
+	) );
+}
+
+/** ラベルを登録し、指定の並びでカテゴリーに表示する。 [slug => 名前] */
+function monte_add_area_motions( string $area_slug, array $motions ): void {
+	$area = get_term_by( 'slug', $area_slug, 'area' );
+	if ( ! $area ) {
+		return;
+	}
+	$order = 1;
+	foreach ( $motions as $slug => $name ) {
+		$same_name = get_term_by( 'name', $name, 'hand_motion' ); // 管理画面で先に追加されたものも使う
+		$id        = $same_name ? (int) $same_name->term_id : monte_ensure_term( 'hand_motion', $name, $slug );
+		if ( $id ) {
+			$areas = array_map( 'intval', (array) get_field( 'field_motion_area', "hand_motion_{$id}" ) );
+			update_term_meta( $id, 'order', $order++ );
+			update_field( 'field_motion_area', array_values( array_unique( array_merge( $areas, array( $area->term_id ) ) ) ), "hand_motion_{$id}" );
 		}
 	}
 }

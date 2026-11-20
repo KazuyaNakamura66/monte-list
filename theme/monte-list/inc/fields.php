@@ -66,7 +66,7 @@ add_action( 'acf/include_fields', function () {
 			'type'         => 'text',
 			'instructions' => '例：3歳頃〜6歳頃',
 		),
-		array_merge( $list( "{$p}_recommend", 'こんな子におすすめ', '項目を追加' ), array( 'name' => 'recommend' ) ),
+		array_merge( $list( "{$p}_recommend", 'こんな姿がみられたら', '項目を追加' ), array( 'name' => 'recommend' ) ),
 	);
 
 	// 教具
@@ -162,6 +162,12 @@ add_action( 'acf/include_fields', function () {
 			$common_top( 'activity' ),
 			array(
 				array(
+					'key'   => 'field_activity_aim',
+					'label' => '目的',
+					'name'  => 'aim',
+					'type'  => 'text',
+				),
+				array(
 					'key'          => 'field_activity_overview',
 					'label'        => '活動の概要',
 					'name'         => 'overview',
@@ -229,6 +235,24 @@ add_action( 'acf/include_fields', function () {
 					'return_format' => 'id',
 				),
 				array(
+					'key'          => 'field_activity_howto',
+					'label'        => '作り方',
+					'name'         => 'howto',
+					'type'         => 'repeater',
+					'layout'       => 'table',
+					'button_label' => '手順を追加',
+					'instructions' => '番号は上から順に自動で付きます。ドラッグで並べ替えできます。文中で改行すると、そのまま改行して表示されます',
+					'sub_fields'   => array(
+						array(
+							'key'   => 'field_activity_howto_text',
+							'label' => '手順',
+							'name'  => 'text',
+							'type'  => 'textarea',
+							'rows'  => 2,
+						),
+					),
+				),
+				array(
 					'key'          => 'field_activity_presentation',
 					'label'        => '提示方法',
 					'name'         => 'presentation',
@@ -257,10 +281,10 @@ add_action( 'acf/include_fields', function () {
 		),
 	) );
 
-	// 領域の設定（タブの色・見出し・関連資料）
+	// カテゴリーの設定（タブの色・見出し・関連資料）
 	acf_add_local_field_group( array(
 		'key'      => 'group_area',
-		'title'    => '領域の表示設定',
+		'title'    => 'カテゴリーの表示設定',
 		'location' => array( array( array( 'param' => 'taxonomy', 'operator' => '==', 'value' => 'area' ) ) ),
 		'fields'   => array(
 			array(
@@ -296,7 +320,7 @@ add_action( 'acf/include_fields', function () {
 				'label'        => '一覧の見出し',
 				'name'         => 'list_heading',
 				'type'         => 'text',
-				'instructions' => '例：指先の活動（空欄なら領域名を表示）',
+				'instructions' => '例：指先の活動（空欄ならカテゴリー名を表示）',
 			),
 			array(
 				'key'          => 'field_area_step_title',
@@ -304,7 +328,7 @@ add_action( 'acf/include_fields', function () {
 				'name'         => 'step_title',
 				'type'         => 'text',
 				'placeholder'  => '発達ステップ',
-				'instructions' => '一覧のステップ欄の見出し（空欄なら「発達ステップ」）。ステップの中身は「発達段階」で、表示する領域にこの領域を選んだものが並びます',
+				'instructions' => '一覧のステップ欄の見出し（空欄なら「発達ステップ」）。ステップには、「表示するカテゴリー」でこのカテゴリーを選んだサブカテゴリーが並びます',
 			),
 			array(
 				'key'          => 'field_area_links',
@@ -332,10 +356,10 @@ add_action( 'acf/include_fields', function () {
 		),
 	) );
 
-	// 発達段階の設定（どの領域のタブに出すか）
+	// サブカテゴリーの設定（どのカテゴリーのタブに出すか）
 	acf_add_local_field_group( array(
 		'key'      => 'group_stage',
-		'title'    => '発達段階の表示設定',
+		'title'    => 'サブカテゴリーの表示設定',
 		'location' => array( array( array( 'param' => 'taxonomy', 'operator' => '==', 'value' => 'stage' ) ) ),
 		'fields'   => array(
 			array(
@@ -348,7 +372,7 @@ add_action( 'acf/include_fields', function () {
 			),
 			array(
 				'key'           => 'field_stage_area',
-				'label'         => '表示する領域',
+				'label'         => '表示するカテゴリー',
 				'name'          => 'stage_area',
 				'type'          => 'taxonomy',
 				'taxonomy'      => 'area',
@@ -358,7 +382,38 @@ add_action( 'acf/include_fields', function () {
 				'save_terms'    => 0,
 				'load_terms'    => 0,
 				'return_format' => 'id',
-				'instructions'  => '一覧の「発達ステップ」とタブ（例：握る）に表示する領域。親の発達段階のみ設定してください。並び順は「順番」で決まります',
+				'instructions'  => '一覧の「発達ステップ」とタブ（例：握る）を表示するカテゴリーを選びます。下の階層のサブカテゴリー（例：把握反射）には設定不要です。並び順は「順番」で決まります',
+			),
+		),
+	) );
+
+	// ラベルの設定（どのカテゴリーの絞り込みに出すか）
+	acf_add_local_field_group( array(
+		'key'      => 'group_motion',
+		'title'    => 'ラベルの表示設定',
+		'location' => array( array( array( 'param' => 'taxonomy', 'operator' => '==', 'value' => 'hand_motion' ) ) ),
+		'fields'   => array(
+			array(
+				'key'          => 'field_motion_order',
+				'label'        => '順番',
+				'name'         => 'order',
+				'type'         => 'number',
+				'step'         => 1,
+				'instructions' => '絞り込みの並び順。小さい数字ほど先に表示されます（空欄は最後）',
+			),
+			array(
+				'key'           => 'field_motion_area',
+				'label'         => '表示するカテゴリー',
+				'name'          => 'motion_area',
+				'type'          => 'taxonomy',
+				'taxonomy'      => 'area',
+				'field_type'    => 'multi_select',
+				'allow_null'    => 1,
+				'add_term'      => 0,
+				'save_terms'    => 0,
+				'load_terms'    => 0,
+				'return_format' => 'id',
+				'instructions'  => '絞り込みと記事の編集画面に、このラベルを表示するカテゴリー（複数選択可）',
 			),
 		),
 	) );

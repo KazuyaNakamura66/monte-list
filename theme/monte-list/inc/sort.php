@@ -40,7 +40,7 @@ function monte_is_sortable_screen(): bool {
 }
 
 add_action( 'admin_enqueue_scripts', function () {
-	if ( ! monte_is_sortable_screen() || ! empty( $_GET['orderby'] ) || ! empty( $_GET['s'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+	if ( ! monte_is_sortable_screen() || monte_admin_is_all_list() || ! empty( $_GET['orderby'] ) || ! empty( $_GET['s'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
 		return;
 	}
 	$dir = get_template_directory();
